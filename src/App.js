@@ -1,24 +1,102 @@
-import logo from "./logo.svg";
 import "./App.css";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import moment from "moment";
+import axios from "axios";
 
 function App() {
-  const [log, setLog] = useState("");
-  const [prevVal, setPrevVal] = useState(0);
+  const [name, setName] = useState("");
+  const [position, setPosition] = useState("");
+  const [department, setDepartment] = useState("");
+  const [isMoreFiles, setisMoreFiles] = useState(false);
 
-  const setLogIfArrowClicked = e => {
-    const currentVal = e.target.value;
-    if (currentVal - prevVal === 1) {
-      setLog(log + 1);
-    } else if (currentVal - prevVal === -1) {
-      setLog(log - 1);
-    }
-    setPrevVal(currentVal);
-  };
+  // const [underdep, setUnderdep] = useState("");
+  // const [workunit, setWorkUnit] = useState("");
+  let [chooseFile, addChooseFile] = useState([]);
+
+  const [projName, setProjName] = useState([]);
+  const [selectedTatiFilm, setSelectedTatiFilm] = useState(projName[0]);
+
+  const [disTH, setdisTH] = useState(" ");
+  const [disEng, setdisEng] = useState(" ");
+  const [disComEng, setdisComEng] = useState(" ");
+
+  const [checkTH, isCheckTH] = useState(false);
+  const [checkEng, isCheckEng] = useState(false);
+  const [checkComEng, isCheckComEng] = useState(false);
+
+  let refTHtoE = useRef();
+  let refEtoTH = useRef();
+  let refComposeEng = useRef();
+  let refDate = useRef();
+  let refFile = useRef();
+
+  useEffect(() => {
+    axios
+      .get("https://api.rihes.cmu.ac.th/api/v1/auth/user", {
+        headers: {
+          Authorization:
+            "Bearer " +
+            "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiI5MGRmMjQ1YS1hNjFlLTQ2M2QtOGFkNC02OWE5ZGJjODkzNTIiLCJqdGkiOiJhOGJiOTYwNjYyN2I1M2RmMWU2OGUyYjdhMGY5NmNiMzEzOGMxODY5ZjI1MzdhODlhNjYxZWVhOGMzMDRlNDZjMDRmMDBhMGRmNDJlMWRjZSIsImlhdCI6MTYyMjE3NjExOSwibmJmIjoxNjIyMTc2MTE5LCJleHAiOjE2NTM3MTIxMTksInN1YiI6IjUxNiIsInNjb3BlcyI6W119.U0X7o1hnzBGs38DdE55_ant_pvrrKmv5IjBvJmMyRYPG4LEOR6C_UtbmYzPPcSmXODrrZHvndo3_PaR7KJ-o8ZwYe2KlV5VTtW7hhuEHJvHfkG0k6y7AUocRKDoQI65v5-_0XABVhCejR4RhYCd5Hl-zORcx29w97w3Ry7ThOoHDmm286YiCgDB3pkhkuXNlT_P3x7BPqVwP80yK8TdcnSqL6wPwtSJLPNvX34m7e5GYVgk9X1Y0HG-gzAer7h-eqBMnEJJkphmV3W-eSwyra8S5gFD_czO3xVbgBxoYJNiVqRM2ubDyzj6ykmhA0_H0lLS2WGGZZEnpSGafA70ELXNU3hXoefxqLaupR2juBNrW2HLx4Y6lGC9SNHmll-G4DxkPmGrNFrdzN2noOe8jYlX3fUu9hKeHe8G4Q2cybvJajrfKcpEjvch0Iw3WdB9E5Lv6CZqlVdWHHThHEXPgWDzL5mydgb7TVQz4gQGpwsm4Y57w4s-3FclLxJdaOZnyJTAV_FA2GVWPPDZkYfd_dY8FMehpa_YuN2iQCy-JxpyaANMJorTUS_pnD0Mv65ZWRNZEHTZMGZs9-hfRkIs5ElcTwN7vDVd1WKiuicvhw_ab7aCM_MvxDO2lwWRY-ybPn2TRyZYIMP7S2-ZT7uBoIrS3qNoxsWMSTjzxMDonVyk",
+        },
+      })
+      .then(function (response) {
+        console.log(response.data);
+        const data = response.data.data;
+        setName(data.name);
+        setPosition(data.position);
+        setDepartment(data.department);
+      })
+      .catch(function (error) {
+        console.log(error);
+      })
+      .then(function () {
+        // always executed
+      });
+
+    axios
+      .get("https://api.rihes.cmu.ac.th/api/translate/v1/project", {
+        headers: {
+          Authorization:
+            "Bearer " +
+            "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiI5MGRmMjQ1YS1hNjFlLTQ2M2QtOGFkNC02OWE5ZGJjODkzNTIiLCJqdGkiOiJhOGJiOTYwNjYyN2I1M2RmMWU2OGUyYjdhMGY5NmNiMzEzOGMxODY5ZjI1MzdhODlhNjYxZWVhOGMzMDRlNDZjMDRmMDBhMGRmNDJlMWRjZSIsImlhdCI6MTYyMjE3NjExOSwibmJmIjoxNjIyMTc2MTE5LCJleHAiOjE2NTM3MTIxMTksInN1YiI6IjUxNiIsInNjb3BlcyI6W119.U0X7o1hnzBGs38DdE55_ant_pvrrKmv5IjBvJmMyRYPG4LEOR6C_UtbmYzPPcSmXODrrZHvndo3_PaR7KJ-o8ZwYe2KlV5VTtW7hhuEHJvHfkG0k6y7AUocRKDoQI65v5-_0XABVhCejR4RhYCd5Hl-zORcx29w97w3Ry7ThOoHDmm286YiCgDB3pkhkuXNlT_P3x7BPqVwP80yK8TdcnSqL6wPwtSJLPNvX34m7e5GYVgk9X1Y0HG-gzAer7h-eqBMnEJJkphmV3W-eSwyra8S5gFD_czO3xVbgBxoYJNiVqRM2ubDyzj6ykmhA0_H0lLS2WGGZZEnpSGafA70ELXNU3hXoefxqLaupR2juBNrW2HLx4Y6lGC9SNHmll-G4DxkPmGrNFrdzN2noOe8jYlX3fUu9hKeHe8G4Q2cybvJajrfKcpEjvch0Iw3WdB9E5Lv6CZqlVdWHHThHEXPgWDzL5mydgb7TVQz4gQGpwsm4Y57w4s-3FclLxJdaOZnyJTAV_FA2GVWPPDZkYfd_dY8FMehpa_YuN2iQCy-JxpyaANMJorTUS_pnD0Mv65ZWRNZEHTZMGZs9-hfRkIs5ElcTwN7vDVd1WKiuicvhw_ab7aCM_MvxDO2lwWRY-ybPn2TRyZYIMP7S2-ZT7uBoIrS3qNoxsWMSTjzxMDonVyk",
+        },
+      })
+      .then(function (response) {
+        console.log(response.data);
+        const data = response.data;
+        setProjName(data);
+      })
+      .catch(function (error) {
+        console.log(error);
+      })
+      .then(function () {
+        // always executed
+      });
+
+    // axios({
+    //   method: "post",
+    //   url: "/user/12345",
+    //   data: {
+    //     firstName: "Fred",
+    //     lastName: "Flintstone",
+    //   },
+    // });
+
+    // const access_token = localStorage.getItem('access_token')
+    refTHtoE.current.value = 0;
+    refEtoTH.current.value = 0;
+    refComposeEng.current.value = 0;
+  }, []);
+
+  const children = chooseFile.map((val) => {
+    return (
+      <p id={val.id}>{val.name}</p>
+    )
+  });
 
   return (
     <div class="animated fadeInRight m-t">
-      <div class="mail-box">
+      <div class="mail-box ml-3 mr-3 mt-3">
         <div class="mail-body">
           <div class="form-group row">
             <label for="txtCreated_at" class="col-sm-2 control-label">
@@ -29,8 +107,10 @@ function App() {
                 type="text"
                 class="form-control"
                 placeholder=""
+                value={moment(new Date()).format("YYYY-MM-DD")}
                 id="txtCreated_at_label"
                 readonly
+                disabled
               />
               <input
                 type="hidden"
@@ -50,26 +130,26 @@ function App() {
             <div class="col-sm-10">
               <input
                 name="txtTitle1"
-                value="ขอใช้บริการแปล-เรียบเรียงเอกสาร"
                 id="txtTitle1"
                 type="text"
                 class="form-control"
-                readonly
+                value='ขอใช้บริการแปล-เรียบเรียงเอกสาร'
+                readOnly
               />
             </div>
           </div>
           <div class="form-group row">
-            <label for="txtะนHead" class="col-sm-2 control-label">
+            <label for="txtHead" class="col-sm-2 control-label">
               เรียน:
             </label>
             <div class="col-sm-10">
               <input
                 name="txtHead"
-                value="หัวหน้างานบริหารงานวิจัย บริหารวิชาการและวิเทศสัมพันธ์"
                 id="txtHead"
                 type="text"
                 class="form-control"
-                readonly
+                value='หัวหน้างานบริหารงานวิจัย บริหารวิชาการและวิเทศสัมพันธ์'
+                readOnly
               />
             </div>
           </div>
@@ -80,11 +160,11 @@ function App() {
             <div class="col-sm-10">
               <input
                 name="txtEmpName"
-                value=""
                 id="txtEmpName"
                 type="text"
+                value={name}
+                readOnly
                 class="form-control"
-                readonly
               />
             </div>
           </div>
@@ -95,11 +175,11 @@ function App() {
             <div class="col-sm-10">
               <input
                 name="txtEmpPosition"
-                value=""
                 id="txtEmpPosition"
                 type="text"
+                value={position}
+                readOnly
                 class="form-control"
-                readonly
               />
             </div>
           </div>
@@ -110,11 +190,11 @@ function App() {
             <div class="col-sm-10">
               <input
                 name="txtEmpOrgid"
-                value=""
                 id="txtEmpOrgid"
                 type="text"
                 class="form-control"
-                readonly
+                value={department}
+                readOnly
               />
             </div>
           </div>
@@ -127,12 +207,19 @@ function App() {
             </label>
             <div class="col-sm-10">
               <select
-                name="txtProject"
-                id="txtProject"
                 class="custom-select"
-                required
+                value={selectedTatiFilm}
+                onChange={(e) =>
+                  setSelectedTatiFilm(
+                    projName.find((projName) => projName.id === e.target.value)
+                  )
+                }
               >
-                <option selected></option>
+                {projName.map((projName) => (
+                  <option key={projName.id} value={projName.id}>
+                    {projName.name}
+                  </option>
+                ))}
               </select>
               <div class="invalid-feedback">ห้ามว่าง.</div>
             </div>
@@ -159,25 +246,36 @@ function App() {
             <div class="col-sm-10">
               <div class="form-inline">
                 <input
+                  ref={refTHtoE}
                   id="thai_to_eng_page_title"
                   name="thai_to_eng_page_title"
                   value="1"
                   type="checkbox"
                   class="sickstate"
+                  onChange={(e) => {
+                    if (!checkTH) {
+                      setdisTH("");
+                      isCheckTH(true);
+                    } else {
+                      setdisTH(" ");
+                      refTHtoE.current.value = 0;
+                      isCheckTH(false);
+                    }
+                  }}
                 />
                 ภาษาไทยเป็นภาษาอังกฤษ โดยมีต้นฉบับภาษาไทย{" "}
                 <span class="ml-5">จำนวน</span>{" "}
                 <input
-                  name="thai_to_eng_page"
-                  id="thai_to_eng_page"
+                  ref={refTHtoE}
+                  name="eng_to_thai_page"
+                  id="eng_to_thai_page"
                   class="form-control  ml-1 mr-1"
                   style={{ width: 100 }}
                   type="number"
-                  value="0"
-                  maxlength="4"
-                  max="1000"
-                  min="1"
-                  disabled
+                  pattern="[0-9]*"
+                  inputmode="numeric"
+                  min={0}
+                  disabled={disTH}
                 />{" "}
                 หน้า
               </div>
@@ -185,29 +283,33 @@ function App() {
                 <input
                   id="eng_to_thai_page_title"
                   name="eng_to_thai_page_title"
-                  value="1"
                   type="checkbox"
                   class="sickstate"
+                  onChange={(e) => {
+                    if (!checkEng) {
+                      setdisEng("");
+                      isCheckEng(true);
+                    } else {
+                      setdisEng(" ");
+                      refEtoTH.current.value = 0;
+                      isCheckEng(false);
+                    }
+                  }}
                 />{" "}
                 ภาษาอังกฤษเป็นภาษาไทย โดยมีต้นฉบับภาษาอังกฤษ{" "}
                 <span class="ml-4">จำนวน</span>{" "}
                 <input
+                  ref={refEtoTH}
                   name="eng_to_thai_page"
                   id="eng_to_thai_page"
                   class="form-control  ml-1 mr-1"
                   style={{ width: 100 }}
                   type="number"
-                  maxlength={4}
-                  max={1000}
-                  min={1}
-                  // onChange={()=>setLogIfArrowClicked()}
-                  onChange={e => {
-                    setLog(log);
-                  }}
-                  // onMouseDownCapture={()=> alert('yyy')}
+                  pattern="[0-9]*"
+                  inputmode="numeric"
+                  min={0}
+                  disabled={disEng}
                 />
-                      <span>{log}</span>
-                {" "}
                 หน้า
               </div>
             </div>
@@ -224,19 +326,29 @@ function App() {
                   value="1"
                   type="checkbox"
                   class="sickstate"
+                  onChange={(e) => {
+                    if (!checkComEng) {
+                      setdisComEng("");
+                      isCheckComEng(true);
+                    } else {
+                      setdisComEng(" ");
+                      refEtoTH.current.value = 0;
+                      isCheckComEng(false);
+                    }
+                  }}
                 />
                 โดยมีต้นฉบับภาษาอังกฤษ <span class="ml-5">จำนวน</span>{" "}
                 <input
-                  name="compose_doc_page"
-                  id="compose_doc_page"
+                  ref={refComposeEng}
+                  name="eng_to_thai_page"
+                  id="eng_to_thai_page"
                   class="form-control  ml-1 mr-1"
                   style={{ width: 100 }}
                   type="number"
-                  value="0"
-                  maxlength="4"
-                  max="1000"
-                  min="1"
-                  disabled
+                  pattern="[0-9]*"
+                  inputmode="numeric"
+                  min={0}
+                  disabled={disComEng}
                 />{" "}
                 หน้า
               </div>
@@ -252,17 +364,40 @@ function App() {
               <div id="showItemFile">
                 {" "}
                 <input
+                  ref={refFile}
                   name="itemFile[]"
                   type="file"
+                  multiple
                   class="form-control-file"
+                  style={{width: 300}}
                 />
               </div>
 
+              {children}
+              {isMoreFiles && <div id="showItemFile">
+                {" "}
+                <input
+                  ref={refFile}
+                  name="itemFile[]"
+                  type="file"
+                  multiple
+                  class="form-control-file"
+                  style={{width: 300}}
+                />
+              </div>}
+
+              
+    
               <button
                 id="itemFileAdd"
                 type="button"
                 class="btn btn-secondary btn-sm m-2"
-              >
+                onClick={()=>                   
+                   setisMoreFiles(true)  
+                  // addChooseFile({name:'t',namee:'t'})
+                  }
+                 >
+                
                 เพิ่มไฟล์อีก
               </button>
             </div>
@@ -274,11 +409,12 @@ function App() {
             </label>
             <div class="col-sm-10">
               <input
+                ref={refDate}
                 type="date"
                 class="form-control"
-                placeholder="dd/mm/yyyy"
                 id="done_at"
                 name="done_at"
+                onChange={() => alert(refDate.current.value)}
                 data-mask="99/99/9999"
                 style={{ width: 200 }}
                 required
@@ -309,7 +445,7 @@ function App() {
               </p>
             </div>
           </div>
-          <div class="mail-body text-right tooltip-demo">
+          <div class="mail-body text-right tooltip-demo mb-3">
             <button
               id="submitform1"
               type="button"
@@ -317,6 +453,7 @@ function App() {
               data-toggle="tooltip"
               data-placement="top"
               title="บันทึก"
+              onClick={()=> alert('ty')}
             >
               <i class="fa fa-save"></i> บันทึก
             </button>
