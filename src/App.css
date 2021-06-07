@@ -1,3 +1,4 @@
+
 .App {
   text-align: center;
 }
@@ -36,3 +37,53 @@
     transform: rotate(360deg);
   }
 }
+.caret {
+  display: inline-block;
+  width: 0;
+  height: 0;
+  margin-left: 2px;
+  vertical-align: middle;
+  border-top: 4px dashed;
+  border-top: 4px solid \9;
+  border-right: 4px solid transparent;
+  border-left: 4px solid transparent;
+}
+
+.dropup .caret, .navbar-fixed-bottom .dropdown .caret {
+  border-top: 0;
+  border-bottom: 4px dashed;
+  border-bottom: 4px solid \9;
+  content: "";
+}
+th .order-4:before {
+  margin-left: 3.5px;
+  content: "\2191";
+  opacity: 0.4;
+}
+
+th .order-4:after {
+  content: "\2193";
+  opacity: 0.4;
+}
+
+th .caret-4-asc:before {
+  margin-left: 3.5px;
+  content: "\2191";
+}
+
+th .caret-4-asc:after {
+  content: "\2193";
+  opacity: 0.4;
+}
+
+th .caret-4-desc:before {
+  margin-left: 3.5px;
+  content: "\2191";
+  opacity: 0.4;
+}
+
+th .caret-4-desc:after {
+  content: "\2193";
+}
+
+
