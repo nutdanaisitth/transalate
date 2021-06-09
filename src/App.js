@@ -3,8 +3,9 @@ import { useEffect, useRef, useState } from "react";
 import moment from "moment";
 import axios from "axios";
 import { Button, Form } from "react-bootstrap";
+import { observer, inject } from "mobx-react";
 
-function App() {
+const App = observer((props) => {
   const [name, setName] = useState("");
   const [position, setPosition] = useState("");
   const [department, setDepartment] = useState("");
@@ -35,6 +36,7 @@ function App() {
   let refTxtname = useRef();
   let refTxtnote = useRef();
   let refProjName = useRef();
+  let refForm = useRef();
 
   const printBtn = () => {
     var para = document.createElement("input");
@@ -44,6 +46,16 @@ function App() {
       .getElementById("showItemFile")
       .addEventListener("change", (e) => handleFile(e));
   };
+
+  const handleClose = () => {
+    props.AddNewStore.storeClose()
+  }
+
+  // useEffect(() => {
+  //   if (props.AddNewStore.isSave === true) {
+  //    refForm.current && refForm.current.submit(new Event("submit",handleSubmit()));
+  //   }
+  // }, [props.AddNewStore.isSave]);
 
   useEffect(() => {
     // storeAccessToken(localStorage.getItem("access_token"));
@@ -147,6 +159,7 @@ function App() {
       )
       .then(function (response) {
         console.log(response);
+        handleClose()
       })
       .catch(function (error) {
         console.log(error);
@@ -172,7 +185,12 @@ function App() {
   };
 
   return (
-    <Form noValidate validated={validated} onSubmit={handleSubmit}>
+    <Form
+      noValidate
+      validated={validated}
+      onSubmit={handleSubmit}
+      ref={refForm}
+    >
       <div class="animated fadeInRight m-t">
         <div class="mail-box ml-3 mr-3 mt-3">
           <div class="mail-body">
@@ -515,6 +533,7 @@ function App() {
               </div>
             </div>
             <div class="mail-body text-right tooltip-demo mb-3">
+              <Button variant="secondary"  onClick={()=>handleClose()} style={{marginRight: 16}} >ปิด</Button>
               <Button
                 id="submitform1"
                 type="submit"
@@ -524,8 +543,10 @@ function App() {
                 title="บันทึก"
                 onClick={(e) => handleSubmit(e)}
               >
-                <i class="fa fa-save"></i> บันทึก
+                <i class="fa fa-save mr-2"></i>บันทึก
               </Button>
+              <Button variant="danger"  onClick={()=>handleClose()} style={{marginLeft: 16}} ><i class="fa fa-send mr-2"></i>ส่ง</Button>
+
             </div>
             <div class="clearfix"></div>
           </div>
@@ -533,6 +554,6 @@ function App() {
       </div>
     </Form>
   );
-}
+});
 
-export default App;
+export default inject("AddNewStore")(App);

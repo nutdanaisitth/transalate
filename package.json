@@ -8,12 +8,17 @@
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
     "axios": "^0.21.1",
+    "babel-preset-mobx": "^2.0.0",
     "bootstrap": "^4.6.0",
     "bootstrap-icons": "^1.5.0",
+    "customize-cra": "^1.0.0",
     "font-awesome": "^4.7.0",
     "mdbreact": "5.0.0",
+    "mobx": "5.15.1",
+    "mobx-react": "6.1.4",
     "moment": "^2.29.1",
     "react": "^17.0.2",
+    "react-app-rewired": "^2.1.8",
     "react-bootstrap": "^1.6.0",
     "react-bootstrap-table-next": "1.0.0",
     "react-csv": "^2.0.3",
@@ -46,5 +51,11 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@babel/core": "^7.1.0",
+    "@babel/plugin-proposal-class-properties": "^7.1.0",
+    "@babel/plugin-proposal-decorators": "^7.14.2",
+    "@babel/preset-env": "^7.1.0"
   }
 }
