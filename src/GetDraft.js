@@ -1,13 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import { Table, Tabs, Tab, Modal, Button } from "react-bootstrap";
 import { MDBBtn, MDBDataTable } from "mdbreact";
-import App from "./App";
+import AddNew from "./AddNew";
 import { observer, inject } from "mobx-react";
 import axios from "axios";
 import moment from "moment";
 import _ from "lodash";
+require('moment/locale/th.js');
 
 function MyVerticallyCenteredModal(props) {
+
   return (
     <Modal {...props} size="xl">
       <Modal.Header closeButton>
@@ -16,7 +18,7 @@ function MyVerticallyCenteredModal(props) {
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <App />
+        <AddNew />
       </Modal.Body>
       <Modal.Footer></Modal.Footer>
     </Modal>
@@ -24,6 +26,8 @@ function MyVerticallyCenteredModal(props) {
 }
 
 const RenderTabs = observer((props) => {
+  moment.locale('th')
+  // var localLocale = moment()
   useEffect(() => {
     handleClose();
   }, [props.AddNewStore.isClose]);
@@ -32,6 +36,8 @@ const RenderTabs = observer((props) => {
   const [chClick, setStateClick] = useState(false);
 
   useEffect(() => {
+    // moment.locale("th")
+   
     // storeAccessToken(localStorage.getItem("access_token"));
     axios
       .get("https://api.rihes.cmu.ac.th/api/translate/v1/draft", {
@@ -65,21 +71,22 @@ const RenderTabs = observer((props) => {
   };
 
   const handleRowClick = (e) => {
-    // document.getElementById("edit-btn").addEventListener("mouseover", alert(e.projName))
-    if (chClick) {
-      alert(e.projName);
-      // setStateClick(false);
+
+    // localLocale.locale('th')
+    if (props.GetDraftStore.onClick) {
+      // props.GetDraftStore.storeTest(e.projName)
+      alert('t')
     }
   };
 
   var rows = [];
-  var i = 0;
-  for (i; i < dataRes.length; i++) {
+  var i 
+  for (i = 0; i < dataRes.length; i++) {
     rows.push({
-      useInProject: dataRes[i].name,
-      projName: dataRes[i].project_name,
+      useInProject: dataRes[i].project_name,
+      projName: dataRes[i].name,
       price: "-",
-      doneAt: dataRes[i].done_at,
+      doneAt: moment(new Date(dataRes[i].done_at)).format('LL'),
       acknowledgeHead: "-",
       acknowledgeStaff: "-",
       status: dataRes[i].status_id.map(({ name }) => name),
@@ -89,25 +96,27 @@ const RenderTabs = observer((props) => {
             variant="info"
             size="sm"
             id="edit-btn"
-            onMouseOver={() => setStateClick(true)}
-            onMouseOut={() => setStateClick(false)}
+            onMouseOver={() => props.GetDraftStore.storeOnClick(true)}
+            onMouseOut={() => props.GetDraftStore.storeOnClick(false)}
           >
-            <i class="fa fa-pencil mr-1"></i> รายละเอียดแบบฟอร์ม
+            <i class="fa fa-eye mr-1"></i> รายละเอียดแบบฟอร์ม
           </Button>
         </div>,
       ],
       clickEvent: (e) => handleRowClick(e),
-      createdAt: moment(dataRes[i].created_at).format("YYYY-MM-DD"),
+      createdAt: moment(dataRes[i].created_at).format("LL"),
     });
   }
 
-  const labelHead = (label) => {
+  const labelHead = (lb) => {
     return (
-      <div style={{ marginBottom: 4 }}>
-        <Button variant="" className="btn-block">
-          <b>{label}</b>
-          <i key="Lorem" className="fa fa-sort ml-3" aria-hidden="true"></i>
-        </Button>
+      <div >
+      <b>{lb}</b>
+        <i
+          key="Lorem"
+          className="fa fa-sort ml-3 mt-3 mb-3"
+          aria-hidden="true"
+        ></i>
       </div>
     );
   };
@@ -122,7 +131,7 @@ const RenderTabs = observer((props) => {
           width: 150,
         },
         {
-          label: [labelHead("ใช้ในงาน/โครงการ")],
+          label: [labelHead("ใช้ในงาน / โครงการ")],
           field: "useInProject",
           sort: "asc",
           width: 270,
@@ -152,19 +161,13 @@ const RenderTabs = observer((props) => {
           width: 100,
         },
         {
-          label: [labelHead("สถานะ")],
+          label: [labelHead ("สถานะ")],
           field: "status",
           sort: "asc",
           width: 100,
         },
         {
-          label: [
-            <div style={{ marginBottom: 4, pointerEvents: "auto" }}>
-              <Button variant="" className="btn-block shadow-none">
-                <b>แก้ไข/ติดตาม</b>
-              </Button>
-            </div>,
-          ],
+          label: [labelHead("แก้ไข / ติดตาม")],
           field: "editFollowUp",
           sort: "asc",
           width: 150,
@@ -226,4 +229,4 @@ const RenderTabs = observer((props) => {
   );
 });
 
-export default inject("AddNewStore")(RenderTabs);
+export default inject("AddNewStore","GetDraftStore")(RenderTabs);

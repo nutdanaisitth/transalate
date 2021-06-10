@@ -1,9 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import App from './App';
 import reportWebVitals from './reportWebVitals';
-import Tables from './Table';
+import GetDraft from './GetDraft';
 import 'font-awesome/css/font-awesome.min.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "bootstrap-icons/font/bootstrap-icons.css";
@@ -18,7 +17,7 @@ import stores from './stores';
 ReactDOM.render(
   <React.StrictMode>
     <Provider {...stores}>
-    <Tables />
+    <GetDraft />
     </Provider>
   </React.StrictMode>,
   document.getElementById('root')
