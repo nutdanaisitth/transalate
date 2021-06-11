@@ -6,7 +6,9 @@ import { Button, Form } from "react-bootstrap";
 import { observer, inject } from "mobx-react";
 require("moment/locale/th.js");
 
-const AddNew = observer((props) => {
+
+const Edit = observer((props) => {
+  moment.locale('th')
   const [name, setName] = useState("");
   const [position, setPosition] = useState("");
   const [department, setDepartment] = useState("");
@@ -17,16 +19,28 @@ const AddNew = observer((props) => {
   let [chooseFile, addChooseFile] = useState([]);
 
   const [projName, setProjName] = useState([]);
-  const [selectedTatiFilm, setSelectedTatiFilm] = useState(projName[0]);
+  const [selectedTatiFilm, setSelectedTatiFilm] = useState(
+    props.GetDraftStore.fileName
+  );
 
   const [disTH, setdisTH] = useState(" ");
   const [disEng, setdisEng] = useState(" ");
   const [disComEng, setdisComEng] = useState(" ");
   const [status_id, setStatusid] = useState("");
 
-  const [checkTH, isCheckTH] = useState(false);
-  const [checkEng, isCheckEng] = useState(false);
-  const [checkComEng, isCheckComEng] = useState(false);
+  // refTHtoE.current.value = props.GetDraftStore.thaiToEng ? props.GetDraftStore.thaiToEng : 0 ;
+  // refEtoTH.current.value = props.GetDraftStore.engToThai ? props.GetDraftStore.engToThai : 0 ;
+  // refComposeEng.current.value = props.GetDraftStore.composeEng ? props.GetDraftStore.composeEng : 0 ;
+
+  const [checkTH, isCheckTH] = useState(
+    props.GetDraftStore.thaiToEng ? true : false
+  );
+  const [checkEng, isCheckEng] = useState(
+    props.GetDraftStore.engToThai ? true : false
+  );
+  const [checkComEng, isCheckComEng] = useState(
+    props.GetDraftStore.composeEng ? true : false
+  );
   const [validated, setValidated] = useState(false);
 
   let refTHtoE = useRef();
@@ -51,12 +65,6 @@ const AddNew = observer((props) => {
   const handleClose = () => {
     props.AddNewStore.storeClose();
   };
-
-  // useEffect(() => {
-  //   if (props.AddNewStore.isSave === true) {
-  //    refForm.current && refForm.current.submit(new Event("submit",handleSubmit()));
-  //   }
-  // }, [props.AddNewStore.isSave]);
 
   useEffect(() => {
     // storeAccessToken(localStorage.getItem("access_token"));
@@ -106,10 +114,18 @@ const AddNew = observer((props) => {
 
     var date = new Date();
     var currentDate = date.toISOString().substring(0, 10);
-    refTHtoE.current.value = 0;
-    refEtoTH.current.value = 0;
-    refComposeEng.current.value = 0;
-    document.getElementById("done_at").value = currentDate;
+    refTHtoE.current.value = props.GetDraftStore.thaiToEng
+      ? props.GetDraftStore.thaiToEng
+      : 0;
+    refEtoTH.current.value = props.GetDraftStore.engToThai
+      ? props.GetDraftStore.engToThai
+      : 0;
+    refComposeEng.current.value = props.GetDraftStore.composeEng
+      ? props.GetDraftStore.composeEng
+      : 0;
+    refTxtname.current.value = props.GetDraftStore.projName;
+    refTxtnote.current.value = props.GetDraftStore.note;
+    document.getElementById("done_at").value = moment(props.GetDraftStore.doneAt).format('YYYY-MM-DD')
   }, []);
 
   const handleFile = (e) => {
@@ -146,7 +162,7 @@ const AddNew = observer((props) => {
     formData.append("status_id", status_id);
     axios
       .post(
-        "https://api.rihes.cmu.ac.th/api/translate/v1/translate",
+        "https://api.rihes.cmu.ac.th/api/translate/v1/translate/" + props.GetDraftStore.id,
         formData,
         {
           headers: {
@@ -170,8 +186,36 @@ const AddNew = observer((props) => {
       });
   };
 
+  const deleteSubmit = (event) => {
+    event.preventDefault();
+
+    axios
+      .delete(
+        "https://api.rihes.cmu.ac.th/api/translate/v1/translate/" + props.GetDraftStore.id,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization:
+              "Bearer " +
+              "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiI5MGRmMjQ1YS1hNjFlLTQ2M2QtOGFkNC02OWE5ZGJjODkzNTIiLCJqdGkiOiJhOGJiOTYwNjYyN2I1M2RmMWU2OGUyYjdhMGY5NmNiMzEzOGMxODY5ZjI1MzdhODlhNjYxZWVhOGMzMDRlNDZjMDRmMDBhMGRmNDJlMWRjZSIsImlhdCI6MTYyMjE3NjExOSwibmJmIjoxNjIyMTc2MTE5LCJleHAiOjE2NTM3MTIxMTksInN1YiI6IjUxNiIsInNjb3BlcyI6W119.U0X7o1hnzBGs38DdE55_ant_pvrrKmv5IjBvJmMyRYPG4LEOR6C_UtbmYzPPcSmXODrrZHvndo3_PaR7KJ-o8ZwYe2KlV5VTtW7hhuEHJvHfkG0k6y7AUocRKDoQI65v5-_0XABVhCejR4RhYCd5Hl-zORcx29w97w3Ry7ThOoHDmm286YiCgDB3pkhkuXNlT_P3x7BPqVwP80yK8TdcnSqL6wPwtSJLPNvX34m7e5GYVgk9X1Y0HG-gzAer7h-eqBMnEJJkphmV3W-eSwyra8S5gFD_czO3xVbgBxoYJNiVqRM2ubDyzj6ykmhA0_H0lLS2WGGZZEnpSGafA70ELXNU3hXoefxqLaupR2juBNrW2HLx4Y6lGC9SNHmll-G4DxkPmGrNFrdzN2noOe8jYlX3fUu9hKeHe8G4Q2cybvJajrfKcpEjvch0Iw3WdB9E5Lv6CZqlVdWHHThHEXPgWDzL5mydgb7TVQz4gQGpwsm4Y57w4s-3FclLxJdaOZnyJTAV_FA2GVWPPDZkYfd_dY8FMehpa_YuN2iQCy-JxpyaANMJorTUS_pnD0Mv65ZWRNZEHTZMGZs9-hfRkIs5ElcTwN7vDVd1WKiuicvhw_ab7aCM_MvxDO2lwWRY-ybPn2TRyZYIMP7S2-ZT7uBoIrS3qNoxsWMSTjzxMDonVyk",
+            // access_token,
+          },
+        }
+      )
+      .then(function (response) {
+        console.log(response);
+        handleClose();
+      })
+      .catch(function (error) {
+        console.log("Error", error);
+      })
+      .then(function () {
+        // always executed
+      });
+  };
+
   const handleSubmitDraft = (event) => {
-    setStatusid("0")
+    setStatusid("0");
     const form = event.target;
     props.AddNewStore.storeValidate(true);
     if (form.checkValidity() === false) {
@@ -190,7 +234,7 @@ const AddNew = observer((props) => {
     }
   };
   const handleSubmitSend = (event) => {
-    setStatusid("1")
+    setStatusid("1");
     const form = event.target;
     props.AddNewStore.storeValidate(true);
     if (form.checkValidity() === false) {
@@ -202,7 +246,7 @@ const AddNew = observer((props) => {
       setValidated(true);
       props.AddNewStore.storeIsFirst(props.AddNewStore.isFirst + 1);
       if (props.AddNewStore.isValidate && props.AddNewStore.isFirst === 2) {
-        event.preventDefault();      
+        event.preventDefault();
         requestSubmit();
         props.AddNewStore.clearIsFirst();
       }
@@ -228,7 +272,7 @@ const AddNew = observer((props) => {
                   type="text"
                   class="form-control"
                   placeholder=""
-                  value={moment(new Date()).format('LL')}
+                  value={props.GetDraftStore.createdAt}
                   id="txtCreated_at_label"
                   readonly
                   disabled
@@ -376,7 +420,8 @@ const AddNew = observer((props) => {
                     ref={refTHtoE}
                     id="thai_to_eng_page_title"
                     name="thai_to_eng_page_title"
-                    value="1"
+                    value="0"
+                    checked={checkTH}
                     type="checkbox"
                     class="sickstate"
                     onChange={(e) => {
@@ -411,6 +456,7 @@ const AddNew = observer((props) => {
                     id="eng_to_thai_page_title"
                     name="eng_to_thai_page_title"
                     type="checkbox"
+                    checked={checkEng}
                     class="sickstate"
                     onChange={(e) => {
                       if (!checkEng) {
@@ -453,13 +499,14 @@ const AddNew = observer((props) => {
                     value="1"
                     type="checkbox"
                     class="sickstate"
+                    checked={checkComEng}
                     onChange={(e) => {
                       if (!checkComEng) {
                         setdisComEng("");
                         isCheckComEng(true);
                       } else {
                         setdisComEng(" ");
-                        refEtoTH.current.value = 0;
+                        refComposeEng.current.value = 0;
                         isCheckComEng(false);
                       }
                     }}
@@ -585,6 +632,16 @@ const AddNew = observer((props) => {
               >
                 <i class="fa fa-send mr-2"></i>ส่ง
               </Button>
+
+              <Button
+                variant="danger"
+                type="submit"
+                class="btn  btn-primary"
+                onClick={(e) => deleteSubmit(e)}
+                style={{ marginLeft: 16 }}
+              >
+                <i class="fa fa-trash mr-2"></i>ลบ
+              </Button>
             </div>
             <div class="clearfix"></div>
           </div>
@@ -594,4 +651,4 @@ const AddNew = observer((props) => {
   );
 });
 
-export default inject("AddNewStore")(AddNew);
+export default inject("AddNewStore", "GetDraftStore")(Edit);
