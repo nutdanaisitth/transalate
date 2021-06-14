@@ -52,49 +52,72 @@ const RenderTabs = observer((props) => {
   moment.locale("th");
   useEffect(() => {
     handleCloseAddnew();
-    handleCloseEdit()
-    getDraft()
+    handleCloseEdit();
+    getDraft();
   }, [props.AddNewStore.isClose]);
 
   const [dataRes, setData] = useState([]);
+  const [dataStatus, setDataStatus] = useState([]);
+  const [statusId, storeStatusId] = useState([]);
 
-  const getDraft =()=> {
+  const getDraft = () => {
     axios
-    .get("https://api.rihes.cmu.ac.th/api/translate/v1/draft", {
-      headers: {
-        Authorization:
-          "Bearer " +
-          "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiI5MGRmMjQ1YS1hNjFlLTQ2M2QtOGFkNC02OWE5ZGJjODkzNTIiLCJqdGkiOiJhOGJiOTYwNjYyN2I1M2RmMWU2OGUyYjdhMGY5NmNiMzEzOGMxODY5ZjI1MzdhODlhNjYxZWVhOGMzMDRlNDZjMDRmMDBhMGRmNDJlMWRjZSIsImlhdCI6MTYyMjE3NjExOSwibmJmIjoxNjIyMTc2MTE5LCJleHAiOjE2NTM3MTIxMTksInN1YiI6IjUxNiIsInNjb3BlcyI6W119.U0X7o1hnzBGs38DdE55_ant_pvrrKmv5IjBvJmMyRYPG4LEOR6C_UtbmYzPPcSmXODrrZHvndo3_PaR7KJ-o8ZwYe2KlV5VTtW7hhuEHJvHfkG0k6y7AUocRKDoQI65v5-_0XABVhCejR4RhYCd5Hl-zORcx29w97w3Ry7ThOoHDmm286YiCgDB3pkhkuXNlT_P3x7BPqVwP80yK8TdcnSqL6wPwtSJLPNvX34m7e5GYVgk9X1Y0HG-gzAer7h-eqBMnEJJkphmV3W-eSwyra8S5gFD_czO3xVbgBxoYJNiVqRM2ubDyzj6ykmhA0_H0lLS2WGGZZEnpSGafA70ELXNU3hXoefxqLaupR2juBNrW2HLx4Y6lGC9SNHmll-G4DxkPmGrNFrdzN2noOe8jYlX3fUu9hKeHe8G4Q2cybvJajrfKcpEjvch0Iw3WdB9E5Lv6CZqlVdWHHThHEXPgWDzL5mydgb7TVQz4gQGpwsm4Y57w4s-3FclLxJdaOZnyJTAV_FA2GVWPPDZkYfd_dY8FMehpa_YuN2iQCy-JxpyaANMJorTUS_pnD0Mv65ZWRNZEHTZMGZs9-hfRkIs5ElcTwN7vDVd1WKiuicvhw_ab7aCM_MvxDO2lwWRY-ybPn2TRyZYIMP7S2-ZT7uBoIrS3qNoxsWMSTjzxMDonVyk",
-        // access_token,
-      },
-    })
-    .then(function (response) {
-      const data = response.data;
-      console.log(data);
-      setData(data);
-      // setCreatedAt(moment(data.created_at).format("YYYY-MM-DD"));
-    })
-    .catch(function (error) {
-      console.log(error);
-    })
-    .then(function () {
-      // always executed
-    });
-  }
+      .get("https://api.rihes.cmu.ac.th/api/translate/v1/draft", {
+        headers: {
+          Authorization:
+            "Bearer " +
+            "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiI5MGRmMjQ1YS1hNjFlLTQ2M2QtOGFkNC02OWE5ZGJjODkzNTIiLCJqdGkiOiJhOGJiOTYwNjYyN2I1M2RmMWU2OGUyYjdhMGY5NmNiMzEzOGMxODY5ZjI1MzdhODlhNjYxZWVhOGMzMDRlNDZjMDRmMDBhMGRmNDJlMWRjZSIsImlhdCI6MTYyMjE3NjExOSwibmJmIjoxNjIyMTc2MTE5LCJleHAiOjE2NTM3MTIxMTksInN1YiI6IjUxNiIsInNjb3BlcyI6W119.U0X7o1hnzBGs38DdE55_ant_pvrrKmv5IjBvJmMyRYPG4LEOR6C_UtbmYzPPcSmXODrrZHvndo3_PaR7KJ-o8ZwYe2KlV5VTtW7hhuEHJvHfkG0k6y7AUocRKDoQI65v5-_0XABVhCejR4RhYCd5Hl-zORcx29w97w3Ry7ThOoHDmm286YiCgDB3pkhkuXNlT_P3x7BPqVwP80yK8TdcnSqL6wPwtSJLPNvX34m7e5GYVgk9X1Y0HG-gzAer7h-eqBMnEJJkphmV3W-eSwyra8S5gFD_czO3xVbgBxoYJNiVqRM2ubDyzj6ykmhA0_H0lLS2WGGZZEnpSGafA70ELXNU3hXoefxqLaupR2juBNrW2HLx4Y6lGC9SNHmll-G4DxkPmGrNFrdzN2noOe8jYlX3fUu9hKeHe8G4Q2cybvJajrfKcpEjvch0Iw3WdB9E5Lv6CZqlVdWHHThHEXPgWDzL5mydgb7TVQz4gQGpwsm4Y57w4s-3FclLxJdaOZnyJTAV_FA2GVWPPDZkYfd_dY8FMehpa_YuN2iQCy-JxpyaANMJorTUS_pnD0Mv65ZWRNZEHTZMGZs9-hfRkIs5ElcTwN7vDVd1WKiuicvhw_ab7aCM_MvxDO2lwWRY-ybPn2TRyZYIMP7S2-ZT7uBoIrS3qNoxsWMSTjzxMDonVyk",
+          // access_token,
+        },
+      })
+      .then(function (response) {
+        const data = response.data;
+        console.log(data);
+        setData(data);
+        // setCreatedAt(moment(data.created_at).format("YYYY-MM-DD"));
+      })
+      .catch(function (error) {
+        console.log(error);
+      })
+      .then(function () {
+        // always executed
+      });
+  };
+
+  const getStatusId = () => {
+    axios
+      .get("https://api.rihes.cmu.ac.th/api/translate/v1/status_user", {
+        headers: {
+          Authorization:
+            "Bearer " +
+            "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiI5MGRmMjQ1YS1hNjFlLTQ2M2QtOGFkNC02OWE5ZGJjODkzNTIiLCJqdGkiOiJhOGJiOTYwNjYyN2I1M2RmMWU2OGUyYjdhMGY5NmNiMzEzOGMxODY5ZjI1MzdhODlhNjYxZWVhOGMzMDRlNDZjMDRmMDBhMGRmNDJlMWRjZSIsImlhdCI6MTYyMjE3NjExOSwibmJmIjoxNjIyMTc2MTE5LCJleHAiOjE2NTM3MTIxMTksInN1YiI6IjUxNiIsInNjb3BlcyI6W119.U0X7o1hnzBGs38DdE55_ant_pvrrKmv5IjBvJmMyRYPG4LEOR6C_UtbmYzPPcSmXODrrZHvndo3_PaR7KJ-o8ZwYe2KlV5VTtW7hhuEHJvHfkG0k6y7AUocRKDoQI65v5-_0XABVhCejR4RhYCd5Hl-zORcx29w97w3Ry7ThOoHDmm286YiCgDB3pkhkuXNlT_P3x7BPqVwP80yK8TdcnSqL6wPwtSJLPNvX34m7e5GYVgk9X1Y0HG-gzAer7h-eqBMnEJJkphmV3W-eSwyra8S5gFD_czO3xVbgBxoYJNiVqRM2ubDyzj6ykmhA0_H0lLS2WGGZZEnpSGafA70ELXNU3hXoefxqLaupR2juBNrW2HLx4Y6lGC9SNHmll-G4DxkPmGrNFrdzN2noOe8jYlX3fUu9hKeHe8G4Q2cybvJajrfKcpEjvch0Iw3WdB9E5Lv6CZqlVdWHHThHEXPgWDzL5mydgb7TVQz4gQGpwsm4Y57w4s-3FclLxJdaOZnyJTAV_FA2GVWPPDZkYfd_dY8FMehpa_YuN2iQCy-JxpyaANMJorTUS_pnD0Mv65ZWRNZEHTZMGZs9-hfRkIs5ElcTwN7vDVd1WKiuicvhw_ab7aCM_MvxDO2lwWRY-ybPn2TRyZYIMP7S2-ZT7uBoIrS3qNoxsWMSTjzxMDonVyk",
+          // access_token,
+        },
+      })
+      .then(function (response) {
+        const data = response.data;
+        console.log(data);
+        setDataStatus(data);
+        for (i = 0; i < data.length; i++) {
+          statusId.push(data[i].id);
+        }
+      })
+      .catch(function (error) {
+        console.log(error);
+      })
+      .then(function () {
+        // always executed
+      });
+  };
 
   useEffect(() => {
     // storeAccessToken(localStorage.getItem("access_token"));
-    getDraft()
-  
+    // getDraft()
+    getStatusId();
   }, []);
 
   const [modalAddNewShow, setAddNewModalShow] = useState(false);
   const [modalEditShow, setEditModalShow] = useState(false);
-  const [count, setCount] = useState(0);
-
-  const forceUpdate = useForceUpdate();
-
-  // const forceUpdate = React.useReducer(() => ({}))[1]
 
   const [key, setKey] = useState("save_draft");
 
@@ -109,9 +132,7 @@ const RenderTabs = observer((props) => {
   };
 
   const handleRowClick = (e) => {
-    forceUpdate();
-
-    var m = moment(e.doneAt, 'DD MMMM YYYY', 'th')
+    var m = moment(e.doneAt, "DD MMMM YYYY", "th");
 
     if (props.GetDraftStore.onClick) {
       props.GetDraftStore.storeData(
@@ -122,15 +143,55 @@ const RenderTabs = observer((props) => {
         e.thaiToEng,
         e.engToThai,
         e.composeEng,
-        m.locale('en').format('YYYY/MM/DD'),
+        m.locale("en").format("YYYY/MM/DD"),
         e.note,
         e.createdAt,
         e.id
       );
       setEditModalShow(true);
-
-      // props.GetDraftStore.storeTest(e.projName)
     }
+  };
+
+  const renderTab = () => {
+    return (
+      <Tabs
+        id="controlled-tab-example"
+        activeKey={key}
+        onSelect={(k) => setKey(k)}
+      >
+        {statusId.includes(0) && (
+          <Tab eventKey="save_draft" title="บันทึกฉบับร่าง">
+            {Tables()}
+          </Tab>
+        )}
+
+        {statusId.includes(1) && (
+          <Tab eventKey="request" title="ส่ง">
+            {Tables()}
+          </Tab>
+        )}
+        {statusId.includes(2) && (
+          <Tab eventKey="approved" title="อนุมัติ">
+            {Tables()}
+          </Tab>
+        )}
+        {statusId.includes(3) && (
+          <Tab eventKey="accept" title="รับงานแล้ว">
+            {Tables()}
+          </Tab>
+        )}
+        {statusId.includes(4) && (
+          <Tab eventKey="complete" title="ส่งงานแล้ว">
+            {Tables()}
+          </Tab>
+        )}
+        {statusId.includes(5) && (
+          <Tab eventKey="reject" title="ปฏิเสธ">
+            {Tables()}
+          </Tab>
+        )}
+      </Tabs>
+    );
   };
 
   var rows = [];
@@ -277,19 +338,7 @@ const RenderTabs = observer((props) => {
       {modalEditShow && (
         <EditModal show={true} onHide={() => setEditModalShow(false)} />
       )}
-      <Tabs
-        id="controlled-tab-example"
-        activeKey={key}
-        onSelect={(k) => setKey(k)}
-      >
-        <Tab eventKey="save_draft" title="บันทึกฉบับร่าง">
-          {Tables()}
-        </Tab>
-        <Tab eventKey="request" title="ร้องขอ"></Tab>
-        <Tab eventKey="approved" title="อนุมัติ"></Tab>
-        <Tab eventKey="complete" title="เรียบร้อย"></Tab>
-        <Tab eventKey="reject" title="ปฏิเสธ"></Tab>
-      </Tabs>
+      {renderTab()}
     </div>
   );
 });

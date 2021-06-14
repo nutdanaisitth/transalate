@@ -6,9 +6,8 @@ import { Button, Form } from "react-bootstrap";
 import { observer, inject } from "mobx-react";
 require("moment/locale/th.js");
 
-
 const Edit = observer((props) => {
-  moment.locale('th')
+  moment.locale("th");
   const [name, setName] = useState("");
   const [position, setPosition] = useState("");
   const [department, setDepartment] = useState("");
@@ -19,8 +18,11 @@ const Edit = observer((props) => {
   let [chooseFile, addChooseFile] = useState([]);
 
   const [projName, setProjName] = useState([]);
-  const [selectedTatiFilm, setSelectedTatiFilm] = useState(
+  const [selectedProjectName, setSelectedProjectName] = useState(
     props.GetDraftStore.fileName
+  );
+
+  const [selectedStatusUpdate, setSelectedStatusUpdate] = useState(['บันทึ']
   );
 
   const [disTH, setdisTH] = useState(" ");
@@ -125,7 +127,9 @@ const Edit = observer((props) => {
       : 0;
     refTxtname.current.value = props.GetDraftStore.projName;
     refTxtnote.current.value = props.GetDraftStore.note;
-    document.getElementById("done_at").value = moment(props.GetDraftStore.doneAt).format('YYYY-MM-DD')
+    document.getElementById("done_at").value = moment(
+      props.GetDraftStore.doneAt
+    ).format("YYYY-MM-DD");
   }, []);
 
   const handleFile = (e) => {
@@ -162,7 +166,8 @@ const Edit = observer((props) => {
     formData.append("status_id", status_id);
     axios
       .post(
-        "https://api.rihes.cmu.ac.th/api/translate/v1/translate/" + props.GetDraftStore.id,
+        "https://api.rihes.cmu.ac.th/api/translate/v1/translate/" +
+          props.GetDraftStore.id,
         formData,
         {
           headers: {
@@ -191,7 +196,8 @@ const Edit = observer((props) => {
 
     axios
       .delete(
-        "https://api.rihes.cmu.ac.th/api/translate/v1/translate/" + props.GetDraftStore.id,
+        "https://api.rihes.cmu.ac.th/api/translate/v1/translate/" +
+          props.GetDraftStore.id,
         {
           headers: {
             "Content-Type": "multipart/form-data",
@@ -264,7 +270,7 @@ const Edit = observer((props) => {
         <div class="mail-box ml-3 mr-3 mt-3">
           <div class="mail-body">
             <div class="form-group row">
-              <label for="txtCreated_at" class="col-sm-2 control-label">
+              <label for="txtCreated_at" class="col-sm-2 control-label" style={{alignSelf:'center'}}>
                 วันที่:
               </label>
               <div class="col-sm-10">
@@ -289,7 +295,7 @@ const Edit = observer((props) => {
               </div>
             </div>
             <div class="form-group row">
-              <label for="ddlLeaveTypeId" class="col-sm-2 control-label">
+              <label for="ddlLeaveTypeId" class="col-sm-2 control-label" style={{alignSelf:'center'}}>
                 เรื่อง:
               </label>
               <div class="col-sm-10">
@@ -304,7 +310,7 @@ const Edit = observer((props) => {
               </div>
             </div>
             <div class="form-group row">
-              <label for="txtHead" class="col-sm-2 control-label">
+              <label for="txtHead" class="col-sm-2 control-label" style={{alignSelf:'center'}}>
                 เรียน:
               </label>
               <div class="col-sm-10">
@@ -319,7 +325,7 @@ const Edit = observer((props) => {
               </div>
             </div>
             <div class="form-group row">
-              <label for="txtEmpName" class="col-sm-2 control-label">
+              <label for="txtEmpName" class="col-sm-2 control-label" style={{alignSelf:'center'}}>
                 ข้าพเจ้า:
               </label>
               <div class="col-sm-10">
@@ -334,7 +340,7 @@ const Edit = observer((props) => {
               </div>
             </div>
             <div class="form-group row">
-              <label for="txtEmpPosition" class="col-sm-2 control-label">
+              <label for="txtEmpPosition" class="col-sm-2 control-label" style={{alignSelf:'center'}}>
                 ตำแหน่ง:
               </label>
               <div class="col-sm-10">
@@ -349,7 +355,7 @@ const Edit = observer((props) => {
               </div>
             </div>
             <div class="form-group row">
-              <label for="txtEmpOrgid" class="col-sm-2 control-label">
+              <label for="txtEmpOrgid" class="col-sm-2 control-label" style={{alignSelf:'center'}}>
                 สังกัด:
               </label>
               <div class="col-sm-10">
@@ -374,9 +380,9 @@ const Edit = observer((props) => {
                 <select
                   ref={refProjName}
                   class="custom-select"
-                  value={selectedTatiFilm}
+                  value={selectedProjectName}
                   onChange={(e) =>
-                    setSelectedTatiFilm(
+                    setSelectedProjectName(
                       projName.find(
                         (projName) => projName.id === e.target.value
                       )
@@ -393,7 +399,7 @@ const Edit = observer((props) => {
               </div>
             </div>
             <div class="form-group row">
-              <label for="txtName" class="col-sm-2 control-label">
+              <label for="txtName" class="col-sm-2 control-label" style={{alignSelf:'center'}}>
                 ชื่อเอกสาร:
               </label>
               <div class="col-sm-10" id="checkInput">
@@ -411,7 +417,7 @@ const Edit = observer((props) => {
               </div>
             </div>
             <div class="form-group row mt-4">
-              <label for="txtEmpOrgid" class="col-sm-2 control-label">
+              <label for="txtEmpOrgid" class="col-sm-2 control-label mt-2" >
                 1. แปลเอกสาร:
               </label>
               <div class="col-sm-10">
@@ -434,6 +440,7 @@ const Edit = observer((props) => {
                         isCheckTH(false);
                       }
                     }}
+                    style={{marginRight: 8}}
                   />
                   ภาษาไทยเป็นภาษาอังกฤษ โดยมีต้นฉบับภาษาไทย{" "}
                   <span class="ml-5">จำนวน</span>{" "}
@@ -468,7 +475,8 @@ const Edit = observer((props) => {
                         isCheckEng(false);
                       }
                     }}
-                  />{" "}
+                    style={{marginRight: 8}}
+                  />
                   ภาษาอังกฤษเป็นภาษาไทย โดยมีต้นฉบับภาษาอังกฤษ{" "}
                   <span class="ml-4">จำนวน</span>{" "}
                   <input
@@ -488,7 +496,7 @@ const Edit = observer((props) => {
               </div>
             </div>
             <div class="form-group row mt-2">
-              <label for="txtEmpOrgid" class="col-sm-2 control-label">
+              <label for="txtEmpOrgid" class="col-sm-2 control-label mt-2">
                 2. การเรียบเรียงเอกสาร (Edit):
               </label>
               <div class="col-sm-10">
@@ -510,6 +518,7 @@ const Edit = observer((props) => {
                         isCheckComEng(false);
                       }
                     }}
+                    style={{marginRight: 8}}
                   />
                   โดยมีต้นฉบับภาษาอังกฤษ <span class="ml-5">จำนวน</span>{" "}
                   <input
@@ -641,6 +650,104 @@ const Edit = observer((props) => {
                 style={{ marginLeft: 16 }}
               >
                 <i class="fa fa-trash mr-2"></i>ลบ
+              </Button>
+            </div>
+            <div class="clearfix"></div>
+          </div>
+        </div>
+        <hr></hr>
+      </div>
+      <div class="animated fadeInRight m-t">
+        <div class="mail-box ml-3 mr-3 mt-3">
+          <div class="mail-body" >
+            <div class="mb-3">
+              <h4>สำหรับเจ้าหน้าที่</h4>
+            </div>
+            <div class="form-group row ">
+              <label for="txtProject" class="col-sm-2 control-label mt-2 center" style={{alignSelf:'center'}}>
+                แก้ไขสถานะ:
+              </label>
+              <div class="col-sm-10 mt-3 mb-3">
+                <select
+                  ref={refProjName}
+                  class="custom-select"
+                  value={selectedProjectName}
+                  onChange={(e) =>
+                    setSelectedProjectName(
+                      projName.find(
+                        (projName) => projName.id === e.target.value
+                      )
+                    )
+                  }
+                >
+                  {projName.map((projName) => (
+                    <option key={projName.id} value={projName.name}>
+                      {projName.name}
+                    </option>
+                  ))}
+                </select>
+                <div class="invalid-feedback">ห้ามว่าง.</div>
+              </div>
+            </div>
+
+            <div class="mail-body text-right tooltip-demo mb-3">
+              {/* <Button
+                variant="secondary"
+                onClick={() => handleClose()}
+                style={{ marginRight: 16 }}
+              >
+                ปิด
+              </Button> */}
+
+              <Button
+                id="submitform1"
+                type="submit"
+                class="btn  btn-primary"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="บันทึก"
+                // onClick={(e) => handleSubmitDraft(e)} 
+              >
+                <i class="fa fa-save mr-2"></i>บันทึก
+              </Button>
+            </div>
+            <div class="clearfix"></div>
+          </div>
+        </div>
+        <hr></hr>
+      </div>
+      <div class="animated fadeInRight m-t">
+        <div class="mail-box ml-3 mr-3 mt-3 mb-3">
+          <div class="mail-body text-left">
+            <div class="mb-3">
+              <h4>สำหรับหัวหน้า</h4>
+            </div>
+
+            <div class="mail-body text-center tooltip-demo mb-3" style={{ marginTop:32}}>
+              <Button
+              variant="success"
+                id="submitform1"
+                type="submit"
+                class="btn  btn-success mr-3"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="บันทึก"
+                // onClick={(e) => handleSubmitDraft(e)}
+              >
+                <i class="fa fa-check mr-2"></i>อนุญาต
+              </Button>
+              <Button
+                variant="danger"
+                id="submitform1"
+                type="submit"
+                class="btn  btn-danger ml-3 "
+                data-toggle="tooltip"
+                data-placement="top"
+                title="บันทึก"
+                style={{marginLeft: 16}}
+                // onClick={(e) => handleSubmitDraft(e)}
+              >
+                <i class="fa fa-times-circle mr-2"></i>ไม่อนุญาต
               </Button>
             </div>
             <div class="clearfix"></div>
