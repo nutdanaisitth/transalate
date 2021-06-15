@@ -52,11 +52,6 @@ const AddNew = observer((props) => {
     props.AddNewStore.storeClose();
   };
 
-  // useEffect(() => {
-  //   if (props.AddNewStore.isSave === true) {
-  //    refForm.current && refForm.current.submit(new Event("submit",handleSubmit()));
-  //   }
-  // }, [props.AddNewStore.isSave]);
 
   useEffect(() => {
     // storeAccessToken(localStorage.getItem("access_token"));
@@ -220,7 +215,7 @@ const AddNew = observer((props) => {
         <div class="mail-box ml-3 mr-3 mt-3">
           <div class="mail-body">
             <div class="form-group row">
-              <label for="txtCreated_at" class="col-sm-2 control-label">
+              <label for="txtCreated_at" class="col-sm-2 control-label"  style={{alignSelf:'center'}}>
                 วันที่:
               </label>
               <div class="col-sm-10">
@@ -245,7 +240,7 @@ const AddNew = observer((props) => {
               </div>
             </div>
             <div class="form-group row">
-              <label for="ddlLeaveTypeId" class="col-sm-2 control-label">
+              <label for="ddlLeaveTypeId" class="col-sm-2 control-label"  style={{alignSelf:'center'}}>
                 เรื่อง:
               </label>
               <div class="col-sm-10">
@@ -260,7 +255,7 @@ const AddNew = observer((props) => {
               </div>
             </div>
             <div class="form-group row">
-              <label for="txtHead" class="col-sm-2 control-label">
+              <label for="txtHead" class="col-sm-2 control-label"  style={{alignSelf:'center'}}>
                 เรียน:
               </label>
               <div class="col-sm-10">
@@ -275,7 +270,7 @@ const AddNew = observer((props) => {
               </div>
             </div>
             <div class="form-group row">
-              <label for="txtEmpName" class="col-sm-2 control-label">
+              <label for="txtEmpName" class="col-sm-2 control-label"  style={{alignSelf:'center'}}>
                 ข้าพเจ้า:
               </label>
               <div class="col-sm-10">
@@ -290,7 +285,7 @@ const AddNew = observer((props) => {
               </div>
             </div>
             <div class="form-group row">
-              <label for="txtEmpPosition" class="col-sm-2 control-label">
+              <label for="txtEmpPosition" class="col-sm-2 control-label"  style={{alignSelf:'center'}}>
                 ตำแหน่ง:
               </label>
               <div class="col-sm-10">
@@ -305,7 +300,7 @@ const AddNew = observer((props) => {
               </div>
             </div>
             <div class="form-group row">
-              <label for="txtEmpOrgid" class="col-sm-2 control-label">
+              <label for="txtEmpOrgid" class="col-sm-2 control-label"  style={{alignSelf:'center'}}>
                 สังกัด:
               </label>
               <div class="col-sm-10">
@@ -349,7 +344,7 @@ const AddNew = observer((props) => {
               </div>
             </div>
             <div class="form-group row">
-              <label for="txtName" class="col-sm-2 control-label">
+              <label for="txtName" class="col-sm-2 control-label"  style={{alignSelf:'center'}}>
                 ชื่อเอกสาร:
               </label>
               <div class="col-sm-10" id="checkInput">
@@ -367,7 +362,7 @@ const AddNew = observer((props) => {
               </div>
             </div>
             <div class="form-group row mt-4">
-              <label for="txtEmpOrgid" class="col-sm-2 control-label">
+              <label for="txtEmpOrgid" class="col-sm-2 control-label mt-2" >
                 1. แปลเอกสาร:
               </label>
               <div class="col-sm-10">
@@ -389,6 +384,7 @@ const AddNew = observer((props) => {
                         isCheckTH(false);
                       }
                     }}
+                    style={{marginRight: 8}}
                   />
                   ภาษาไทยเป็นภาษาอังกฤษ โดยมีต้นฉบับภาษาไทย{" "}
                   <span class="ml-5">จำนวน</span>{" "}
@@ -422,7 +418,8 @@ const AddNew = observer((props) => {
                         isCheckEng(false);
                       }
                     }}
-                  />{" "}
+                    style={{marginRight: 8}}
+                  />
                   ภาษาอังกฤษเป็นภาษาไทย โดยมีต้นฉบับภาษาอังกฤษ{" "}
                   <span class="ml-4">จำนวน</span>{" "}
                   <input
@@ -442,7 +439,7 @@ const AddNew = observer((props) => {
               </div>
             </div>
             <div class="form-group row mt-2">
-              <label for="txtEmpOrgid" class="col-sm-2 control-label">
+              <label for="txtEmpOrgid" class="col-sm-2 control-label mt-2">
                 2. การเรียบเรียงเอกสาร (Edit):
               </label>
               <div class="col-sm-10">
@@ -463,6 +460,7 @@ const AddNew = observer((props) => {
                         isCheckComEng(false);
                       }
                     }}
+                    style={{marginRight: 8}}
                   />
                   โดยมีต้นฉบับภาษาอังกฤษ <span class="ml-5">จำนวน</span>{" "}
                   <input
@@ -484,7 +482,7 @@ const AddNew = observer((props) => {
 
             <div class="form-group row mt-4">
               <label for="txtNote" class="col-sm-2 control-label">
-                ไฟล์แนบ:
+                เลือกไฟล์แนบ:
                 <small>(เอกสารที่ต้องการแปล)</small>{" "}
               </label>
               <div class="col-sm-10">

@@ -14,6 +14,7 @@ class GetDraftStore {
   onEditModal = false
   onAddNewModal = false
   id= 0
+  attachments = []
 
   onClick = false;
   storeData = (
@@ -27,7 +28,8 @@ class GetDraftStore {
     doneAt,
     note,
     createdAt,
-    id
+    id,
+    attachments
   ) => {
     this.name = name;
     this.empDep = empDep;
@@ -40,6 +42,7 @@ class GetDraftStore {
     this.note = note;
     this.createdAt = createdAt;
     this.id = id
+    this.attachments = attachments
   };
   storeOnClick = (onClick) => {
     this.onClick = onClick;

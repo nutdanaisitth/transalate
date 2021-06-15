@@ -18,12 +18,13 @@ const Edit = observer((props) => {
   let [chooseFile, addChooseFile] = useState([]);
 
   const [projName, setProjName] = useState([]);
+  const [selectedTatiFilm, setSelectedTatiFilm] = useState(
+    props.GetDraftStore.fileName
+  );
   const [selectedProjectName, setSelectedProjectName] = useState(
     props.GetDraftStore.fileName
   );
 
-  const [selectedStatusUpdate, setSelectedStatusUpdate] = useState(['บันทึ']
-  );
 
   const [disTH, setdisTH] = useState(" ");
   const [disEng, setdisEng] = useState(" ");
@@ -44,6 +45,9 @@ const Edit = observer((props) => {
     props.GetDraftStore.composeEng ? true : false
   );
   const [validated, setValidated] = useState(false);
+  const [attachments, storeAttachments] = useState(
+    props.GetDraftStore.attachments
+  );
 
   let refTHtoE = useRef();
   let refEtoTH = useRef();
@@ -69,6 +73,16 @@ const Edit = observer((props) => {
   };
 
   useEffect(() => {
+    var i;
+    for (i = 0; i < attachments.length; i++) {
+      const anchor = document.createElement('a');
+      const list = document.getElementById('linksList'); 
+      const li = document.createElement('li');
+      anchor.href = 'https://api.rihes.cmu.ac.th/upload/translate/'+ attachments[i].name;
+      anchor.innerText = attachments[i].name;
+      li.appendChild(anchor);
+      list.appendChild(li);
+    }
     // storeAccessToken(localStorage.getItem("access_token"));
     axios
       .get("https://api.rihes.cmu.ac.th/api/v1/auth/user", {
@@ -115,7 +129,6 @@ const Edit = observer((props) => {
       });
 
     var date = new Date();
-    var currentDate = date.toISOString().substring(0, 10);
     refTHtoE.current.value = props.GetDraftStore.thaiToEng
       ? props.GetDraftStore.thaiToEng
       : 0;
@@ -130,6 +143,8 @@ const Edit = observer((props) => {
     document.getElementById("done_at").value = moment(
       props.GetDraftStore.doneAt
     ).format("YYYY-MM-DD");
+
+    // let a = props.GetDraftStore.attachments
   }, []);
 
   const handleFile = (e) => {
@@ -220,6 +235,7 @@ const Edit = observer((props) => {
       });
   };
 
+
   const handleSubmitDraft = (event) => {
     setStatusid("0");
     const form = event.target;
@@ -267,10 +283,14 @@ const Edit = observer((props) => {
       ref={refForm}
     >
       <div class="animated fadeInRight m-t">
-        <div class="mail-box ml-3 mr-3 mt-3">
+        <div class="mail-box ml-3 mr-3 mt-3" style={{ marginBottom: 32 }}>
           <div class="mail-body">
             <div class="form-group row">
-              <label for="txtCreated_at" class="col-sm-2 control-label" style={{alignSelf:'center'}}>
+              <label
+                for="txtCreated_at"
+                class="col-sm-2 control-label"
+                style={{ alignSelf: "center" }}
+              >
                 วันที่:
               </label>
               <div class="col-sm-10">
@@ -295,7 +315,11 @@ const Edit = observer((props) => {
               </div>
             </div>
             <div class="form-group row">
-              <label for="ddlLeaveTypeId" class="col-sm-2 control-label" style={{alignSelf:'center'}}>
+              <label
+                for="ddlLeaveTypeId"
+                class="col-sm-2 control-label"
+                style={{ alignSelf: "center" }}
+              >
                 เรื่อง:
               </label>
               <div class="col-sm-10">
@@ -310,7 +334,11 @@ const Edit = observer((props) => {
               </div>
             </div>
             <div class="form-group row">
-              <label for="txtHead" class="col-sm-2 control-label" style={{alignSelf:'center'}}>
+              <label
+                for="txtHead"
+                class="col-sm-2 control-label"
+                style={{ alignSelf: "center" }}
+              >
                 เรียน:
               </label>
               <div class="col-sm-10">
@@ -325,7 +353,11 @@ const Edit = observer((props) => {
               </div>
             </div>
             <div class="form-group row">
-              <label for="txtEmpName" class="col-sm-2 control-label" style={{alignSelf:'center'}}>
+              <label
+                for="txtEmpName"
+                class="col-sm-2 control-label"
+                style={{ alignSelf: "center" }}
+              >
                 ข้าพเจ้า:
               </label>
               <div class="col-sm-10">
@@ -340,7 +372,11 @@ const Edit = observer((props) => {
               </div>
             </div>
             <div class="form-group row">
-              <label for="txtEmpPosition" class="col-sm-2 control-label" style={{alignSelf:'center'}}>
+              <label
+                for="txtEmpPosition"
+                class="col-sm-2 control-label"
+                style={{ alignSelf: "center" }}
+              >
                 ตำแหน่ง:
               </label>
               <div class="col-sm-10">
@@ -355,7 +391,11 @@ const Edit = observer((props) => {
               </div>
             </div>
             <div class="form-group row">
-              <label for="txtEmpOrgid" class="col-sm-2 control-label" style={{alignSelf:'center'}}>
+              <label
+                for="txtEmpOrgid"
+                class="col-sm-2 control-label"
+                style={{ alignSelf: "center" }}
+              >
                 สังกัด:
               </label>
               <div class="col-sm-10">
@@ -377,12 +417,12 @@ const Edit = observer((props) => {
                 มีความประสงค์ขอใช้บริการเพื่อใช้ในงาน/โครงการ*:
               </label>
               <div class="col-sm-10">
-                <select
+              <select
                   ref={refProjName}
                   class="custom-select"
-                  value={selectedProjectName}
+                  value={selectedTatiFilm}
                   onChange={(e) =>
-                    setSelectedProjectName(
+                    setSelectedTatiFilm(
                       projName.find(
                         (projName) => projName.id === e.target.value
                       )
@@ -399,7 +439,11 @@ const Edit = observer((props) => {
               </div>
             </div>
             <div class="form-group row">
-              <label for="txtName" class="col-sm-2 control-label" style={{alignSelf:'center'}}>
+              <label
+                for="txtName"
+                class="col-sm-2 control-label"
+                style={{ alignSelf: "center" }}
+              >
                 ชื่อเอกสาร:
               </label>
               <div class="col-sm-10" id="checkInput">
@@ -417,7 +461,7 @@ const Edit = observer((props) => {
               </div>
             </div>
             <div class="form-group row mt-4">
-              <label for="txtEmpOrgid" class="col-sm-2 control-label mt-2" >
+              <label for="txtEmpOrgid" class="col-sm-2 control-label mt-2">
                 1. แปลเอกสาร:
               </label>
               <div class="col-sm-10">
@@ -440,7 +484,7 @@ const Edit = observer((props) => {
                         isCheckTH(false);
                       }
                     }}
-                    style={{marginRight: 8}}
+                    style={{ marginRight: 8 }}
                   />
                   ภาษาไทยเป็นภาษาอังกฤษ โดยมีต้นฉบับภาษาไทย{" "}
                   <span class="ml-5">จำนวน</span>{" "}
@@ -475,7 +519,7 @@ const Edit = observer((props) => {
                         isCheckEng(false);
                       }
                     }}
-                    style={{marginRight: 8}}
+                    style={{ marginRight: 8 }}
                   />
                   ภาษาอังกฤษเป็นภาษาไทย โดยมีต้นฉบับภาษาอังกฤษ{" "}
                   <span class="ml-4">จำนวน</span>{" "}
@@ -518,7 +562,7 @@ const Edit = observer((props) => {
                         isCheckComEng(false);
                       }
                     }}
-                    style={{marginRight: 8}}
+                    style={{ marginRight: 8 }}
                   />
                   โดยมีต้นฉบับภาษาอังกฤษ <span class="ml-5">จำนวน</span>{" "}
                   <input
@@ -540,7 +584,7 @@ const Edit = observer((props) => {
 
             <div class="form-group row mt-4">
               <label for="txtNote" class="col-sm-2 control-label">
-                ไฟล์แนบ:
+                เลือกไฟล์แนบ:
                 <small>(เอกสารที่ต้องการแปล)</small>{" "}
               </label>
               <div class="col-sm-10">
@@ -567,6 +611,17 @@ const Edit = observer((props) => {
                 >
                   เพิ่มไฟล์อีก
                 </button>
+              </div>
+            </div>
+
+            <div class="form-group row mt-4">
+              <label for="txtNote" class="col-sm-2 control-label">
+                ไฟล์ที่แนบมา:
+                <small>(กดที่ชื่อไฟล์เพื่อดาวน์โหลด)</small>{" "}
+              </label>
+              <div class="col-sm-10" id="downloadFile">
+                <div id="linksList"></div>
+                {attachments.length == 0 &&  <hr></hr>}
               </div>
             </div>
 
@@ -659,17 +714,21 @@ const Edit = observer((props) => {
       </div>
       <div class="animated fadeInRight m-t">
         <div class="mail-box ml-3 mr-3 mt-3">
-          <div class="mail-body" >
+          <div class="mail-body">
             <div class="mb-3">
               <h4>สำหรับเจ้าหน้าที่</h4>
             </div>
             <div class="form-group row ">
-              <label for="txtProject" class="col-sm-2 control-label mt-2 center" style={{alignSelf:'center'}}>
+              <label
+                for="txtProject"
+                class="col-sm-2 control-label mt-2 center"
+                style={{ alignSelf: "center" }}
+              >
                 แก้ไขสถานะ:
               </label>
               <div class="col-sm-10 mt-3 mb-3">
                 <select
-                  ref={refProjName}
+                  // ref={refProjName}
                   class="custom-select"
                   value={selectedProjectName}
                   onChange={(e) =>
@@ -706,7 +765,7 @@ const Edit = observer((props) => {
                 data-toggle="tooltip"
                 data-placement="top"
                 title="บันทึก"
-                // onClick={(e) => handleSubmitDraft(e)} 
+                // onClick={(e) => handleSubmitDraft(e)}
               >
                 <i class="fa fa-save mr-2"></i>บันทึก
               </Button>
@@ -723,9 +782,12 @@ const Edit = observer((props) => {
               <h4>สำหรับหัวหน้า</h4>
             </div>
 
-            <div class="mail-body text-center tooltip-demo mb-3" style={{ marginTop:32}}>
+            <div
+              class="mail-body text-center tooltip-demo mb-3"
+              style={{ marginTop: 32 }}
+            >
               <Button
-              variant="success"
+                variant="success"
                 id="submitform1"
                 type="submit"
                 class="btn  btn-success mr-3"
@@ -744,7 +806,7 @@ const Edit = observer((props) => {
                 data-toggle="tooltip"
                 data-placement="top"
                 title="บันทึก"
-                style={{marginLeft: 16}}
+                style={{ marginLeft: 16 }}
                 // onClick={(e) => handleSubmitDraft(e)}
               >
                 <i class="fa fa-times-circle mr-2"></i>ไม่อนุญาต

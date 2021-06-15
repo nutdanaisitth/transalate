@@ -53,28 +53,33 @@ const RenderTabs = observer((props) => {
   useEffect(() => {
     handleCloseAddnew();
     handleCloseEdit();
-    getDraft();
+    getStatusId();
+    getDraft(statusRequest);
   }, [props.AddNewStore.isClose]);
 
   const [dataRes, setData] = useState([]);
   const [dataStatus, setDataStatus] = useState([]);
   const [statusId, storeStatusId] = useState([]);
+  const [statusRequest, storeStatusRequest] = useState(0);
 
-  const getDraft = () => {
+  const getDraft = (status_id) => {
     axios
-      .get("https://api.rihes.cmu.ac.th/api/translate/v1/draft", {
-        headers: {
-          Authorization:
-            "Bearer " +
-            "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiI5MGRmMjQ1YS1hNjFlLTQ2M2QtOGFkNC02OWE5ZGJjODkzNTIiLCJqdGkiOiJhOGJiOTYwNjYyN2I1M2RmMWU2OGUyYjdhMGY5NmNiMzEzOGMxODY5ZjI1MzdhODlhNjYxZWVhOGMzMDRlNDZjMDRmMDBhMGRmNDJlMWRjZSIsImlhdCI6MTYyMjE3NjExOSwibmJmIjoxNjIyMTc2MTE5LCJleHAiOjE2NTM3MTIxMTksInN1YiI6IjUxNiIsInNjb3BlcyI6W119.U0X7o1hnzBGs38DdE55_ant_pvrrKmv5IjBvJmMyRYPG4LEOR6C_UtbmYzPPcSmXODrrZHvndo3_PaR7KJ-o8ZwYe2KlV5VTtW7hhuEHJvHfkG0k6y7AUocRKDoQI65v5-_0XABVhCejR4RhYCd5Hl-zORcx29w97w3Ry7ThOoHDmm286YiCgDB3pkhkuXNlT_P3x7BPqVwP80yK8TdcnSqL6wPwtSJLPNvX34m7e5GYVgk9X1Y0HG-gzAer7h-eqBMnEJJkphmV3W-eSwyra8S5gFD_czO3xVbgBxoYJNiVqRM2ubDyzj6ykmhA0_H0lLS2WGGZZEnpSGafA70ELXNU3hXoefxqLaupR2juBNrW2HLx4Y6lGC9SNHmll-G4DxkPmGrNFrdzN2noOe8jYlX3fUu9hKeHe8G4Q2cybvJajrfKcpEjvch0Iw3WdB9E5Lv6CZqlVdWHHThHEXPgWDzL5mydgb7TVQz4gQGpwsm4Y57w4s-3FclLxJdaOZnyJTAV_FA2GVWPPDZkYfd_dY8FMehpa_YuN2iQCy-JxpyaANMJorTUS_pnD0Mv65ZWRNZEHTZMGZs9-hfRkIs5ElcTwN7vDVd1WKiuicvhw_ab7aCM_MvxDO2lwWRY-ybPn2TRyZYIMP7S2-ZT7uBoIrS3qNoxsWMSTjzxMDonVyk",
-          // access_token,
-        },
-      })
+      .get(
+        "https://api.rihes.cmu.ac.th/api/translate/v1/all/status_id/" +
+          status_id,
+        {
+          headers: {
+            Authorization:
+              "Bearer " +
+              "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiI5MGRmMjQ1YS1hNjFlLTQ2M2QtOGFkNC02OWE5ZGJjODkzNTIiLCJqdGkiOiJhOGJiOTYwNjYyN2I1M2RmMWU2OGUyYjdhMGY5NmNiMzEzOGMxODY5ZjI1MzdhODlhNjYxZWVhOGMzMDRlNDZjMDRmMDBhMGRmNDJlMWRjZSIsImlhdCI6MTYyMjE3NjExOSwibmJmIjoxNjIyMTc2MTE5LCJleHAiOjE2NTM3MTIxMTksInN1YiI6IjUxNiIsInNjb3BlcyI6W119.U0X7o1hnzBGs38DdE55_ant_pvrrKmv5IjBvJmMyRYPG4LEOR6C_UtbmYzPPcSmXODrrZHvndo3_PaR7KJ-o8ZwYe2KlV5VTtW7hhuEHJvHfkG0k6y7AUocRKDoQI65v5-_0XABVhCejR4RhYCd5Hl-zORcx29w97w3Ry7ThOoHDmm286YiCgDB3pkhkuXNlT_P3x7BPqVwP80yK8TdcnSqL6wPwtSJLPNvX34m7e5GYVgk9X1Y0HG-gzAer7h-eqBMnEJJkphmV3W-eSwyra8S5gFD_czO3xVbgBxoYJNiVqRM2ubDyzj6ykmhA0_H0lLS2WGGZZEnpSGafA70ELXNU3hXoefxqLaupR2juBNrW2HLx4Y6lGC9SNHmll-G4DxkPmGrNFrdzN2noOe8jYlX3fUu9hKeHe8G4Q2cybvJajrfKcpEjvch0Iw3WdB9E5Lv6CZqlVdWHHThHEXPgWDzL5mydgb7TVQz4gQGpwsm4Y57w4s-3FclLxJdaOZnyJTAV_FA2GVWPPDZkYfd_dY8FMehpa_YuN2iQCy-JxpyaANMJorTUS_pnD0Mv65ZWRNZEHTZMGZs9-hfRkIs5ElcTwN7vDVd1WKiuicvhw_ab7aCM_MvxDO2lwWRY-ybPn2TRyZYIMP7S2-ZT7uBoIrS3qNoxsWMSTjzxMDonVyk",
+            // access_token,
+          },
+        }
+      )
       .then(function (response) {
         const data = response.data;
         console.log(data);
         setData(data);
-        // setCreatedAt(moment(data.created_at).format("YYYY-MM-DD"));
       })
       .catch(function (error) {
         console.log(error);
@@ -110,12 +115,6 @@ const RenderTabs = observer((props) => {
       });
   };
 
-  useEffect(() => {
-    // storeAccessToken(localStorage.getItem("access_token"));
-    // getDraft()
-    getStatusId();
-  }, []);
-
   const [modalAddNewShow, setAddNewModalShow] = useState(false);
   const [modalEditShow, setEditModalShow] = useState(false);
 
@@ -146,9 +145,47 @@ const RenderTabs = observer((props) => {
         m.locale("en").format("YYYY/MM/DD"),
         e.note,
         e.createdAt,
-        e.id
+        e.id,
+        e.attachments
       );
       setEditModalShow(true);
+    }
+  };
+
+  const setEvent = (k) => {
+    switch (k) {
+      case "save_draft":
+        setKey(k);
+        getDraft(0);
+        storeStatusRequest(0);
+        break;
+      case "request":
+        setKey(k);
+        getDraft(1);
+        storeStatusRequest(1);
+        break;
+      case "approved":
+        setKey(k);
+        getDraft(2);
+        storeStatusRequest(2);
+        break;
+      case "accept":
+        setKey(k);
+        getDraft(3);
+        storeStatusRequest(3);
+        break;
+      case "complete":
+        setKey(k);
+        getDraft(4);
+        storeStatusRequest(4);
+        break;
+      case "reject":
+        setKey(k);
+        getDraft(5);
+        storeStatusRequest(5);
+        break;
+      default:
+        break;
     }
   };
 
@@ -157,7 +194,7 @@ const RenderTabs = observer((props) => {
       <Tabs
         id="controlled-tab-example"
         activeKey={key}
-        onSelect={(k) => setKey(k)}
+        onSelect={(k) => setEvent(k)}
       >
         {statusId.includes(0) && (
           <Tab eventKey="save_draft" title="บันทึกฉบับร่าง">
@@ -227,6 +264,7 @@ const RenderTabs = observer((props) => {
       note: dataRes[i].note,
       name: dataRes[i].emp_name,
       empDep: dataRes[i].emp_dep,
+      attachments: dataRes[i].attachments,
     });
   }
 
@@ -307,7 +345,7 @@ const RenderTabs = observer((props) => {
     return (
       <div>
         {
-          <MDBDataTable
+          <MDBDataTable           
             responsive
             btn
             striped
@@ -325,20 +363,22 @@ const RenderTabs = observer((props) => {
   };
 
   return (
-    <div style={{ margin: "auto" }}>
-      <div style={{ marginBottom: 16 }}>
-        <Button variant="success" onClick={() => setAddNewModalShow(true)}>
-          <i class="fa fa-plus mr-2"></i> <b>เพิ่มแบบฟอร์ม</b>
-        </Button>
+    <div class="m-3">
+      <div class="m-3">
+        <div style={{ marginBottom: 16 }}>
+          <Button variant="success" onClick={() => setAddNewModalShow(true)}>
+            <i class="fa fa-plus mr-2"></i> <b>เพิ่มแบบฟอร์ม</b>
+          </Button>
+        </div>
+        <AddNewModal
+          show={modalAddNewShow}
+          onHide={() => setAddNewModalShow(false)}
+        />
+        {modalEditShow && (
+          <EditModal show={true} onHide={() => setEditModalShow(false)} />
+        )}
+        {renderTab()}
       </div>
-      <AddNewModal
-        show={modalAddNewShow}
-        onHide={() => setAddNewModalShow(false)}
-      />
-      {modalEditShow && (
-        <EditModal show={true} onHide={() => setEditModalShow(false)} />
-      )}
-      {renderTab()}
     </div>
   );
 });
