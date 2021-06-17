@@ -1,5 +1,3 @@
-
-
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
@@ -62,3 +60,13 @@ th .caret-4-desc:before {
 th .caret-4-desc:after {
   content: "\2193";
 }
+
+.photo {
+  text-align: center;
+  display: block;
+  justify-content: center;
+  align-items: center;
+  margin: auto;
+  width: 150px;
+}
+

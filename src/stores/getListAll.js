@@ -1,6 +1,6 @@
 import { observable, action, decorate } from "mobx";
 
-class GetDraftStore {
+class GetListAllStore {
   name = "";
   empDep = "";
   projName = "";
@@ -11,10 +11,11 @@ class GetDraftStore {
   doneAt = "";
   note = "";
   createdAt = "";
-  onEditModal = false
-  onAddNewModal = false
-  id= 0
-  attachments = []
+  onEditModal = false;
+  onAddNewModal = false;
+  id = 0;
+  attachments = [];
+  successTitle = ""
 
   onClick = false;
   storeData = (
@@ -41,25 +42,31 @@ class GetDraftStore {
     this.doneAt = doneAt;
     this.note = note;
     this.createdAt = createdAt;
-    this.id = id
-    this.attachments = attachments
+    this.id = id;
+    this.attachments = attachments;
   };
   storeOnClick = (onClick) => {
     this.onClick = onClick;
   };
 
   storeEditModal = (isModal) => {
-    this.onEditModal = isModal
-  }
+    this.onEditModal = isModal;
+  };
   storeAddModal = (isModal) => {
-    this.onAddNewModal = isModal
-  }
+    this.onAddNewModal = isModal;
+  };
+
+  storeSuccessTitle = (successTitle) => {
+    this.successTitle = successTitle;
+  };
+
 }
-decorate(GetDraftStore, {
+decorate(GetListAllStore, {
   test: observable,
   storeClose: action,
   storeData: action,
-  storeEditModal: action
+  storeEditModal: action,
+  storeSuccessTitle: action
 });
 
-export default new GetDraftStore();
+export default new GetListAllStore();

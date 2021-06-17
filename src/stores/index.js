@@ -1,11 +1,9 @@
-
-import AddNewStore from './addnew'
-import GetDraftStore from './getdraft'
-
+import AddNewStore from "./addnew";
+import GetListAllStore from "./getListAll";
 
 const stores = {
-    AddNewStore,
-    GetDraftStore
-}
+  AddNewStore,
+  GetListAllStore,
+};
 
-export default stores
+export default stores;

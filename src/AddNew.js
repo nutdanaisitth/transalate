@@ -10,9 +10,7 @@ const AddNew = observer((props) => {
   const [name, setName] = useState("");
   const [position, setPosition] = useState("");
   const [department, setDepartment] = useState("");
-  const [access_token, storeAccessToken] = useState(
-    localStorage.getItem("access_token")
-  );
+  const [access_token] = useState(localStorage.getItem("access_token"));
 
   let [chooseFile, addChooseFile] = useState([]);
 
@@ -52,9 +50,7 @@ const AddNew = observer((props) => {
     props.AddNewStore.storeClose();
   };
 
-
-  useEffect(() => {
-    // storeAccessToken(localStorage.getItem("access_token"));
+  const getUser = () => {
     axios
       .get("https://api.rihes.cmu.ac.th/api/v1/auth/user", {
         headers: {
@@ -73,11 +69,14 @@ const AddNew = observer((props) => {
       })
       .catch(function (error) {
         console.log(error);
+        alert(error);
       })
       .then(function () {
         // always executed
       });
+  };
 
+  const getProject = () => {
     axios
       .get("https://api.rihes.cmu.ac.th/api/translate/v1/projects", {
         headers: {
@@ -94,10 +93,16 @@ const AddNew = observer((props) => {
       })
       .catch(function (error) {
         console.log(error);
+        alert(error);
       })
       .then(function () {
         // always executed
       });
+  };
+
+  useEffect(() => {
+    getUser();
+    getProject();
 
     var date = new Date();
     var currentDate = date.toISOString().substring(0, 10);
@@ -124,7 +129,7 @@ const AddNew = observer((props) => {
     }
   };
 
-  const requestSubmit = () => {
+  const requestSubmit = async () => {
     let attachment = chooseFile;
     let formData = new FormData();
     formData.append("txtProject_name", refProjName.current.value);
@@ -139,7 +144,7 @@ const AddNew = observer((props) => {
       formData.append("attachment[" + i + "]", file);
     }
     formData.append("status_id", status_id);
-    axios
+    await axios
       .post(
         "https://api.rihes.cmu.ac.th/api/translate/v1/translate",
         formData,
@@ -155,10 +160,12 @@ const AddNew = observer((props) => {
       )
       .then(function (response) {
         console.log(response);
+        props.GetListAllStore.storeSuccessTitle("เพิ่มแบบฟอร์มสำเร็จ");
         handleClose();
       })
       .catch(function (error) {
         console.log("Error", error);
+        alert(error);
       })
       .then(function () {
         // always executed
@@ -166,7 +173,7 @@ const AddNew = observer((props) => {
   };
 
   const handleSubmitDraft = (event) => {
-    setStatusid("0")
+    setStatusid("0");
     const form = event.target;
     props.AddNewStore.storeValidate(true);
     if (form.checkValidity() === false) {
@@ -185,7 +192,7 @@ const AddNew = observer((props) => {
     }
   };
   const handleSubmitSend = (event) => {
-    setStatusid("1")
+    setStatusid("1");
     const form = event.target;
     props.AddNewStore.storeValidate(true);
     if (form.checkValidity() === false) {
@@ -197,7 +204,7 @@ const AddNew = observer((props) => {
       setValidated(true);
       props.AddNewStore.storeIsFirst(props.AddNewStore.isFirst + 1);
       if (props.AddNewStore.isValidate && props.AddNewStore.isFirst === 2) {
-        event.preventDefault();      
+        event.preventDefault();
         requestSubmit();
         props.AddNewStore.clearIsFirst();
       }
@@ -215,7 +222,11 @@ const AddNew = observer((props) => {
         <div class="mail-box ml-3 mr-3 mt-3">
           <div class="mail-body">
             <div class="form-group row">
-              <label for="txtCreated_at" class="col-sm-2 control-label"  style={{alignSelf:'center'}}>
+              <label
+                for="txtCreated_at"
+                class="col-sm-2 control-label"
+                style={{ alignSelf: "center" }}
+              >
                 วันที่:
               </label>
               <div class="col-sm-10">
@@ -223,7 +234,7 @@ const AddNew = observer((props) => {
                   type="text"
                   class="form-control"
                   placeholder=""
-                  value={moment(new Date()).format('LL')}
+                  value={moment(new Date()).format("LL")}
                   id="txtCreated_at_label"
                   readonly
                   disabled
@@ -240,7 +251,11 @@ const AddNew = observer((props) => {
               </div>
             </div>
             <div class="form-group row">
-              <label for="ddlLeaveTypeId" class="col-sm-2 control-label"  style={{alignSelf:'center'}}>
+              <label
+                for="ddlLeaveTypeId"
+                class="col-sm-2 control-label"
+                style={{ alignSelf: "center" }}
+              >
                 เรื่อง:
               </label>
               <div class="col-sm-10">
@@ -255,7 +270,11 @@ const AddNew = observer((props) => {
               </div>
             </div>
             <div class="form-group row">
-              <label for="txtHead" class="col-sm-2 control-label"  style={{alignSelf:'center'}}>
+              <label
+                for="txtHead"
+                class="col-sm-2 control-label"
+                style={{ alignSelf: "center" }}
+              >
                 เรียน:
               </label>
               <div class="col-sm-10">
@@ -270,7 +289,11 @@ const AddNew = observer((props) => {
               </div>
             </div>
             <div class="form-group row">
-              <label for="txtEmpName" class="col-sm-2 control-label"  style={{alignSelf:'center'}}>
+              <label
+                for="txtEmpName"
+                class="col-sm-2 control-label"
+                style={{ alignSelf: "center" }}
+              >
                 ข้าพเจ้า:
               </label>
               <div class="col-sm-10">
@@ -285,7 +308,11 @@ const AddNew = observer((props) => {
               </div>
             </div>
             <div class="form-group row">
-              <label for="txtEmpPosition" class="col-sm-2 control-label"  style={{alignSelf:'center'}}>
+              <label
+                for="txtEmpPosition"
+                class="col-sm-2 control-label"
+                style={{ alignSelf: "center" }}
+              >
                 ตำแหน่ง:
               </label>
               <div class="col-sm-10">
@@ -300,7 +327,11 @@ const AddNew = observer((props) => {
               </div>
             </div>
             <div class="form-group row">
-              <label for="txtEmpOrgid" class="col-sm-2 control-label"  style={{alignSelf:'center'}}>
+              <label
+                for="txtEmpOrgid"
+                class="col-sm-2 control-label"
+                style={{ alignSelf: "center" }}
+              >
                 สังกัด:
               </label>
               <div class="col-sm-10">
@@ -344,7 +375,11 @@ const AddNew = observer((props) => {
               </div>
             </div>
             <div class="form-group row">
-              <label for="txtName" class="col-sm-2 control-label"  style={{alignSelf:'center'}}>
+              <label
+                for="txtName"
+                class="col-sm-2 control-label"
+                style={{ alignSelf: "center" }}
+              >
                 ชื่อเอกสาร:
               </label>
               <div class="col-sm-10" id="checkInput">
@@ -362,7 +397,7 @@ const AddNew = observer((props) => {
               </div>
             </div>
             <div class="form-group row mt-4">
-              <label for="txtEmpOrgid" class="col-sm-2 control-label mt-2" >
+              <label for="txtEmpOrgid" class="col-sm-2 control-label mt-2">
                 1. แปลเอกสาร:
               </label>
               <div class="col-sm-10">
@@ -384,7 +419,7 @@ const AddNew = observer((props) => {
                         isCheckTH(false);
                       }
                     }}
-                    style={{marginRight: 8}}
+                    style={{ marginRight: 8 }}
                   />
                   ภาษาไทยเป็นภาษาอังกฤษ โดยมีต้นฉบับภาษาไทย{" "}
                   <span class="ml-5">จำนวน</span>{" "}
@@ -418,7 +453,7 @@ const AddNew = observer((props) => {
                         isCheckEng(false);
                       }
                     }}
-                    style={{marginRight: 8}}
+                    style={{ marginRight: 8 }}
                   />
                   ภาษาอังกฤษเป็นภาษาไทย โดยมีต้นฉบับภาษาอังกฤษ{" "}
                   <span class="ml-4">จำนวน</span>{" "}
@@ -460,7 +495,7 @@ const AddNew = observer((props) => {
                         isCheckComEng(false);
                       }
                     }}
-                    style={{marginRight: 8}}
+                    style={{ marginRight: 8 }}
                   />
                   โดยมีต้นฉบับภาษาอังกฤษ <span class="ml-5">จำนวน</span>{" "}
                   <input
@@ -592,4 +627,4 @@ const AddNew = observer((props) => {
   );
 });
 
-export default inject("AddNewStore")(AddNew);
+export default inject("AddNewStore", "GetListAllStore")(AddNew);

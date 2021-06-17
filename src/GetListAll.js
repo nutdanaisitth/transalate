@@ -1,20 +1,16 @@
-import React, {
-  useCallback,
-  useEffect,
-  useReducer,
-  useRef,
-  useState,
-} from "react";
-import { Table, Tabs, Tab, Modal, Button } from "react-bootstrap";
-import { MDBBtn, MDBDataTable } from "mdbreact";
+import React, { useEffect, useState } from "react";
+import { Tabs, Tab, Modal, Button } from "react-bootstrap";
+import { MDBDataTable } from "mdbreact";
 import AddNew from "./AddNew";
 import { observer, inject } from "mobx-react";
 import axios from "axios";
 import moment from "moment";
 import _ from "lodash";
 import Edit from "./Edit";
+import logo from "./assets/success.gif";
+import "./index.css";
+
 require("moment/locale/th.js");
-const useForceUpdate = () => useState()[1];
 
 function AddNewModal(props) {
   return (
@@ -48,22 +44,43 @@ function EditModal(props) {
   );
 }
 
+function SuccessModal(props) {
+  return (
+    <Modal {...props} size="sm" >
+      <Modal.Body title>
+        <div className="success" id="textTitle">
+          <img src={logo} className="photo"></img>
+          <h5 class="text-center" >{props.title}
+          </h5>
+        </div>
+      </Modal.Body>
+    </Modal>
+  );
+}
+
 const RenderTabs = observer((props) => {
   moment.locale("th");
   useEffect(() => {
+    if (props.AddNewStore.isClose) {
+      // document.getElementById("textTitle").innerHTML = 'sdssd'
+      setsuccessModal(true);
+    }
     handleCloseAddnew();
     handleCloseEdit();
     getStatusId();
-    getDraft(statusRequest);
+    getListAll(statusRequest);
   }, [props.AddNewStore.isClose]);
-
   const [dataRes, setData] = useState([]);
   const [dataStatus, setDataStatus] = useState([]);
   const [statusId, storeStatusId] = useState([]);
   const [statusRequest, storeStatusRequest] = useState(0);
+  const [modalAddNewShow, setAddNewModalShow] = useState(false);
+  const [modalEditShow, setEditModalShow] = useState(false);
+  const [key, setKey] = useState("save_draft");
+  const [successModal, setsuccessModal] = useState(false);
 
-  const getDraft = (status_id) => {
-    axios
+  const getListAll = async (status_id) => {
+    await axios
       .get(
         "https://api.rihes.cmu.ac.th/api/translate/v1/all/status_id/" +
           status_id,
@@ -77,20 +94,25 @@ const RenderTabs = observer((props) => {
         }
       )
       .then(function (response) {
-        const data = response.data;
-        console.log(data);
-        setData(data);
+        if (response.status === 200) {
+          const data = response.data;
+          console.log(data);
+          setData(data);
+        } else {
+          alert(response.statusText);
+        }
       })
       .catch(function (error) {
         console.log(error);
+        alert(error);
       })
       .then(function () {
         // always executed
       });
   };
 
-  const getStatusId = () => {
-    axios
+  const getStatusId = async () => {
+    await axios
       .get("https://api.rihes.cmu.ac.th/api/translate/v1/status_user", {
         headers: {
           Authorization:
@@ -100,25 +122,31 @@ const RenderTabs = observer((props) => {
         },
       })
       .then(function (response) {
-        const data = response.data;
-        console.log(data);
-        setDataStatus(data);
-        for (i = 0; i < data.length; i++) {
-          statusId.push(data[i].id);
+        if (response.status === 200) {
+          const data = response.data;
+          console.log(response);
+          setDataStatus(data);
+          for (i = 0; i < data.length; i++) {
+            statusId.push(data[i].id);
+          }
+        } else {
+          alert(response.statusText);
         }
       })
       .catch(function (error) {
         console.log(error);
+        alert(error);
       })
       .then(function () {
         // always executed
       });
   };
 
-  const [modalAddNewShow, setAddNewModalShow] = useState(false);
-  const [modalEditShow, setEditModalShow] = useState(false);
-
-  const [key, setKey] = useState("save_draft");
+  const handleCloseSuccess = () => {
+    setTimeout(function () {
+      setsuccessModal(false);
+    }, 1500);
+  };
 
   const handleCloseAddnew = () => {
     props.AddNewStore.clearClose();
@@ -133,8 +161,8 @@ const RenderTabs = observer((props) => {
   const handleRowClick = (e) => {
     var m = moment(e.doneAt, "DD MMMM YYYY", "th");
 
-    if (props.GetDraftStore.onClick) {
-      props.GetDraftStore.storeData(
+    if (props.GetListAllStore.onClick) {
+      props.GetListAllStore.storeData(
         e.name,
         e.empDep,
         e.projName,
@@ -156,32 +184,32 @@ const RenderTabs = observer((props) => {
     switch (k) {
       case "save_draft":
         setKey(k);
-        getDraft(0);
+        getListAll(0);
         storeStatusRequest(0);
         break;
       case "request":
         setKey(k);
-        getDraft(1);
+        getListAll(1);
         storeStatusRequest(1);
         break;
       case "approved":
         setKey(k);
-        getDraft(2);
+        getListAll(2);
         storeStatusRequest(2);
         break;
       case "accept":
         setKey(k);
-        getDraft(3);
+        getListAll(3);
         storeStatusRequest(3);
         break;
       case "complete":
         setKey(k);
-        getDraft(4);
+        getListAll(4);
         storeStatusRequest(4);
         break;
       case "reject":
         setKey(k);
-        getDraft(5);
+        getListAll(5);
         storeStatusRequest(5);
         break;
       default:
@@ -249,8 +277,8 @@ const RenderTabs = observer((props) => {
             variant="info"
             size="sm"
             id="edit-btn"
-            onMouseOver={() => props.GetDraftStore.storeOnClick(true)}
-            onMouseOut={() => props.GetDraftStore.storeOnClick(false)}
+            onMouseOver={() => props.GetListAllStore.storeOnClick(true)}
+            onMouseOut={() => props.GetListAllStore.storeOnClick(false)}
           >
             <i class="fa fa-eye mr-1"></i> รายละเอียดแบบฟอร์ม
           </Button>
@@ -345,7 +373,7 @@ const RenderTabs = observer((props) => {
     return (
       <div>
         {
-          <MDBDataTable           
+          <MDBDataTable
             responsive
             btn
             striped
@@ -377,10 +405,17 @@ const RenderTabs = observer((props) => {
         {modalEditShow && (
           <EditModal show={true} onHide={() => setEditModalShow(false)} />
         )}
+        <SuccessModal
+          show={successModal}
+          onHide={handleCloseSuccess(false)}
+          dialogClassName="success"
+          aria-labelledby="example-custom-modal-styling-title"
+          title= {props.GetListAllStore.successTitle}
+        />
         {renderTab()}
       </div>
     </div>
   );
 });
 
-export default inject("AddNewStore", "GetDraftStore")(RenderTabs);
+export default inject("AddNewStore", "GetListAllStore")(RenderTabs);

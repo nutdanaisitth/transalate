@@ -19,34 +19,33 @@ const Edit = observer((props) => {
 
   const [projName, setProjName] = useState([]);
   const [selectedTatiFilm, setSelectedTatiFilm] = useState(
-    props.GetDraftStore.fileName
+    props.GetListAllStore.fileName
   );
   const [selectedProjectName, setSelectedProjectName] = useState(
-    props.GetDraftStore.fileName
+    props.GetListAllStore.fileName
   );
-
 
   const [disTH, setdisTH] = useState(" ");
   const [disEng, setdisEng] = useState(" ");
   const [disComEng, setdisComEng] = useState(" ");
   const [status_id, setStatusid] = useState("");
 
-  // refTHtoE.current.value = props.GetDraftStore.thaiToEng ? props.GetDraftStore.thaiToEng : 0 ;
-  // refEtoTH.current.value = props.GetDraftStore.engToThai ? props.GetDraftStore.engToThai : 0 ;
-  // refComposeEng.current.value = props.GetDraftStore.composeEng ? props.GetDraftStore.composeEng : 0 ;
+  // refTHtoE.current.value = props.GetListAllStore.thaiToEng ? props.GetListAllStore.thaiToEng : 0 ;
+  // refEtoTH.current.value = props.GetListAllStore.engToThai ? props.GetListAllStore.engToThai : 0 ;
+  // refComposeEng.current.value = props.GetListAllStore.composeEng ? props.GetListAllStore.composeEng : 0 ;
 
   const [checkTH, isCheckTH] = useState(
-    props.GetDraftStore.thaiToEng ? true : false
+    props.GetListAllStore.thaiToEng ? true : false
   );
   const [checkEng, isCheckEng] = useState(
-    props.GetDraftStore.engToThai ? true : false
+    props.GetListAllStore.engToThai ? true : false
   );
   const [checkComEng, isCheckComEng] = useState(
-    props.GetDraftStore.composeEng ? true : false
+    props.GetListAllStore.composeEng ? true : false
   );
   const [validated, setValidated] = useState(false);
   const [attachments, storeAttachments] = useState(
-    props.GetDraftStore.attachments
+    props.GetListAllStore.attachments
   );
 
   let refTHtoE = useRef();
@@ -72,18 +71,7 @@ const Edit = observer((props) => {
     props.AddNewStore.storeClose();
   };
 
-  useEffect(() => {
-    var i;
-    for (i = 0; i < attachments.length; i++) {
-      const anchor = document.createElement('a');
-      const list = document.getElementById('linksList'); 
-      const li = document.createElement('li');
-      anchor.href = 'https://api.rihes.cmu.ac.th/upload/translate/'+ attachments[i].name;
-      anchor.innerText = attachments[i].name;
-      li.appendChild(anchor);
-      list.appendChild(li);
-    }
-    // storeAccessToken(localStorage.getItem("access_token"));
+  const getUser = () => {
     axios
       .get("https://api.rihes.cmu.ac.th/api/v1/auth/user", {
         headers: {
@@ -106,7 +94,9 @@ const Edit = observer((props) => {
       .then(function () {
         // always executed
       });
+  };
 
+  const getProject = () => {
     axios
       .get("https://api.rihes.cmu.ac.th/api/translate/v1/projects", {
         headers: {
@@ -127,24 +117,41 @@ const Edit = observer((props) => {
       .then(function () {
         // always executed
       });
+  };
 
-    var date = new Date();
-    refTHtoE.current.value = props.GetDraftStore.thaiToEng
-      ? props.GetDraftStore.thaiToEng
+  const showFile = () => {
+    var i;
+    for (i = 0; i < attachments.length; i++) {
+      const anchor = document.createElement("a");
+      const list = document.getElementById("linksList");
+      const li = document.createElement("li");
+      anchor.href =
+        "https://api.rihes.cmu.ac.th/upload/translate/" + attachments[i].name;
+      anchor.innerText = attachments[i].name;
+      li.appendChild(anchor);
+      list.appendChild(li);
+    }
+  };
+
+  useEffect(() => {
+    showFile();
+    getUser();
+    getProject();
+
+    refTHtoE.current.value = props.GetListAllStore.thaiToEng
+      ? props.GetListAllStore.thaiToEng
       : 0;
-    refEtoTH.current.value = props.GetDraftStore.engToThai
-      ? props.GetDraftStore.engToThai
+    refEtoTH.current.value = props.GetListAllStore.engToThai
+      ? props.GetListAllStore.engToThai
       : 0;
-    refComposeEng.current.value = props.GetDraftStore.composeEng
-      ? props.GetDraftStore.composeEng
+    refComposeEng.current.value = props.GetListAllStore.composeEng
+      ? props.GetListAllStore.composeEng
       : 0;
-    refTxtname.current.value = props.GetDraftStore.projName;
-    refTxtnote.current.value = props.GetDraftStore.note;
+    refTxtname.current.value = props.GetListAllStore.projName;
+    refTxtnote.current.value = props.GetListAllStore.note;
     document.getElementById("done_at").value = moment(
-      props.GetDraftStore.doneAt
+      props.GetListAllStore.doneAt
     ).format("YYYY-MM-DD");
-
-    // let a = props.GetDraftStore.attachments
   }, []);
 
   const handleFile = (e) => {
@@ -164,7 +171,14 @@ const Edit = observer((props) => {
     }
   };
 
-  const requestSubmit = () => {
+  const requestSubmit = async (event) => {
+    if(status_id === "0"){
+      props.GetListAllStore.storeSuccessTitle("บันทึกแบบฟอร์มสำเร็จ");
+    }
+    else {
+      props.GetListAllStore.storeSuccessTitle("ส่งแบบฟอร์มสำเร็จ");
+    }
+    event.preventDefault();
     let attachment = chooseFile;
     let formData = new FormData();
     formData.append("txtProject_name", refProjName.current.value);
@@ -179,10 +193,10 @@ const Edit = observer((props) => {
       formData.append("attachment[" + i + "]", file);
     }
     formData.append("status_id", status_id);
-    axios
+    await axios
       .post(
         "https://api.rihes.cmu.ac.th/api/translate/v1/translate/" +
-          props.GetDraftStore.id,
+          props.GetListAllStore.id,
         formData,
         {
           headers: {
@@ -195,24 +209,27 @@ const Edit = observer((props) => {
         }
       )
       .then(function (response) {
-        console.log(response);
-        handleClose();
+        if (response.status === 200) {
+          console.log(response);
+          handleClose();
+        }
       })
       .catch(function (error) {
         console.log("Error", error);
+        alert(error);
       })
       .then(function () {
         // always executed
       });
   };
 
-  const deleteSubmit = (event) => {
+  const deleteSubmit = async (event) => {
+    props.GetListAllStore.storeSuccessTitle("ลบแบบฟอร์มสำเร็จ");
     event.preventDefault();
-
-    axios
+    await axios
       .delete(
         "https://api.rihes.cmu.ac.th/api/translate/v1/translate/" +
-          props.GetDraftStore.id,
+          props.GetListAllStore.id,
         {
           headers: {
             "Content-Type": "multipart/form-data",
@@ -234,7 +251,6 @@ const Edit = observer((props) => {
         // always executed
       });
   };
-
 
   const handleSubmitDraft = (event) => {
     setStatusid("0");
@@ -250,7 +266,7 @@ const Edit = observer((props) => {
       props.AddNewStore.storeIsFirst(props.AddNewStore.isFirst + 1);
       if (props.AddNewStore.isValidate && props.AddNewStore.isFirst === 2) {
         event.preventDefault();
-        requestSubmit();
+        requestSubmit(event);
         props.AddNewStore.clearIsFirst();
       }
     }
@@ -269,7 +285,9 @@ const Edit = observer((props) => {
       props.AddNewStore.storeIsFirst(props.AddNewStore.isFirst + 1);
       if (props.AddNewStore.isValidate && props.AddNewStore.isFirst === 2) {
         event.preventDefault();
-        requestSubmit();
+        let trace = new Error().stack;
+        console.log('The link was clicked.' , trace);
+        requestSubmit(event);
         props.AddNewStore.clearIsFirst();
       }
     }
@@ -298,7 +316,7 @@ const Edit = observer((props) => {
                   type="text"
                   class="form-control"
                   placeholder=""
-                  value={props.GetDraftStore.createdAt}
+                  value={props.GetListAllStore.createdAt}
                   id="txtCreated_at_label"
                   readonly
                   disabled
@@ -417,7 +435,7 @@ const Edit = observer((props) => {
                 มีความประสงค์ขอใช้บริการเพื่อใช้ในงาน/โครงการ*:
               </label>
               <div class="col-sm-10">
-              <select
+                <select
                   ref={refProjName}
                   class="custom-select"
                   value={selectedTatiFilm}
@@ -621,7 +639,7 @@ const Edit = observer((props) => {
               </label>
               <div class="col-sm-10" id="downloadFile">
                 <div id="linksList"></div>
-                {attachments.length == 0 &&  <hr></hr>}
+                {attachments.length == 0 && <hr></hr>}
               </div>
             </div>
 
@@ -820,4 +838,4 @@ const Edit = observer((props) => {
   );
 });
 
-export default inject("AddNewStore", "GetDraftStore")(Edit);
+export default inject("AddNewStore", "GetListAllStore")(Edit);
