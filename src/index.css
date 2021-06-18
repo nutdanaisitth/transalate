@@ -69,4 +69,13 @@ th .caret-4-desc:after {
   margin: auto;
   width: 150px;
 }
+.titleTable {
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  display: block;
+  margin: auto;
+  /* width: 200px; */
+}
 

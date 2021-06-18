@@ -15,7 +15,9 @@ class GetListAllStore {
   onAddNewModal = false;
   id = 0;
   attachments = [];
-  successTitle = ""
+  successTitle = "";
+  access_token = "";
+  level = [];
 
   onClick = false;
   storeData = (
@@ -49,9 +51,14 @@ class GetListAllStore {
     this.onClick = onClick;
   };
 
+  storeAccessToken = (token) => {
+    this.access_token = token;
+  };
+
   storeEditModal = (isModal) => {
     this.onEditModal = isModal;
   };
+
   storeAddModal = (isModal) => {
     this.onAddNewModal = isModal;
   };
@@ -59,14 +66,18 @@ class GetListAllStore {
   storeSuccessTitle = (successTitle) => {
     this.successTitle = successTitle;
   };
-
+  storeLevel = (level) => {
+    this.level = level;
+  };
 }
 decorate(GetListAllStore, {
   test: observable,
   storeClose: action,
   storeData: action,
   storeEditModal: action,
-  storeSuccessTitle: action
+  storeSuccessTitle: action,
+  storeAccessToken: action,
+  storeLevel: action
 });
 
 export default new GetListAllStore();

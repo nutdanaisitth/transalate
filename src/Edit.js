@@ -13,7 +13,7 @@ const Edit = observer((props) => {
   const [department, setDepartment] = useState("");
   const [access_token, storeAccessToken] = useState(
     localStorage.getItem("access_token")
-  );
+  ); // eslint-disable-line
 
   let [chooseFile, addChooseFile] = useState([]);
 
@@ -21,14 +21,26 @@ const Edit = observer((props) => {
   const [selectedTatiFilm, setSelectedTatiFilm] = useState(
     props.GetListAllStore.fileName
   );
-  const [selectedProjectName, setSelectedProjectName] = useState(
-    props.GetListAllStore.fileName
-  );
 
   const [disTH, setdisTH] = useState(" ");
   const [disEng, setdisEng] = useState(" ");
   const [disComEng, setdisComEng] = useState(" ");
   const [status_id, setStatusid] = useState("");
+  const [translatorStatus] = useState([
+    {
+      id: 3,
+      name: "รับงาน",
+    },
+    {
+      id: 4,
+      name: "ส่งงาน",
+    },
+    {
+      id: 5,
+      name: "ปฏิเสธงาน",
+    },
+  ]);
+  const [selectedStatus, setSelectedStatus] = useState(translatorStatus[0]);
 
   // refTHtoE.current.value = props.GetListAllStore.thaiToEng ? props.GetListAllStore.thaiToEng : 0 ;
   // refEtoTH.current.value = props.GetListAllStore.engToThai ? props.GetListAllStore.engToThai : 0 ;
@@ -56,6 +68,7 @@ const Edit = observer((props) => {
   let refTxtname = useRef();
   let refTxtnote = useRef();
   let refProjName = useRef();
+  let refTranslatorStatus = useRef();
   let refForm = useRef();
 
   const printBtn = () => {
@@ -73,12 +86,13 @@ const Edit = observer((props) => {
 
   const getUser = () => {
     axios
-      .get("https://api.rihes.cmu.ac.th/api/v1/auth/user", {
+      .get("/api/v1/auth/user", {
         headers: {
           Authorization:
             "Bearer " +
-            "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiI5MGRmMjQ1YS1hNjFlLTQ2M2QtOGFkNC02OWE5ZGJjODkzNTIiLCJqdGkiOiJhOGJiOTYwNjYyN2I1M2RmMWU2OGUyYjdhMGY5NmNiMzEzOGMxODY5ZjI1MzdhODlhNjYxZWVhOGMzMDRlNDZjMDRmMDBhMGRmNDJlMWRjZSIsImlhdCI6MTYyMjE3NjExOSwibmJmIjoxNjIyMTc2MTE5LCJleHAiOjE2NTM3MTIxMTksInN1YiI6IjUxNiIsInNjb3BlcyI6W119.U0X7o1hnzBGs38DdE55_ant_pvrrKmv5IjBvJmMyRYPG4LEOR6C_UtbmYzPPcSmXODrrZHvndo3_PaR7KJ-o8ZwYe2KlV5VTtW7hhuEHJvHfkG0k6y7AUocRKDoQI65v5-_0XABVhCejR4RhYCd5Hl-zORcx29w97w3Ry7ThOoHDmm286YiCgDB3pkhkuXNlT_P3x7BPqVwP80yK8TdcnSqL6wPwtSJLPNvX34m7e5GYVgk9X1Y0HG-gzAer7h-eqBMnEJJkphmV3W-eSwyra8S5gFD_czO3xVbgBxoYJNiVqRM2ubDyzj6ykmhA0_H0lLS2WGGZZEnpSGafA70ELXNU3hXoefxqLaupR2juBNrW2HLx4Y6lGC9SNHmll-G4DxkPmGrNFrdzN2noOe8jYlX3fUu9hKeHe8G4Q2cybvJajrfKcpEjvch0Iw3WdB9E5Lv6CZqlVdWHHThHEXPgWDzL5mydgb7TVQz4gQGpwsm4Y57w4s-3FclLxJdaOZnyJTAV_FA2GVWPPDZkYfd_dY8FMehpa_YuN2iQCy-JxpyaANMJorTUS_pnD0Mv65ZWRNZEHTZMGZs9-hfRkIs5ElcTwN7vDVd1WKiuicvhw_ab7aCM_MvxDO2lwWRY-ybPn2TRyZYIMP7S2-ZT7uBoIrS3qNoxsWMSTjzxMDonVyk",
-          // access_token,
+            // "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiI5MGRmMjQ1YS1hNjFlLTQ2M2QtOGFkNC02OWE5ZGJjODkzNTIiLCJqdGkiOiJhOGJiOTYwNjYyN2I1M2RmMWU2OGUyYjdhMGY5NmNiMzEzOGMxODY5ZjI1MzdhODlhNjYxZWVhOGMzMDRlNDZjMDRmMDBhMGRmNDJlMWRjZSIsImlhdCI6MTYyMjE3NjExOSwibmJmIjoxNjIyMTc2MTE5LCJleHAiOjE2NTM3MTIxMTksInN1YiI6IjUxNiIsInNjb3BlcyI6W119.U0X7o1hnzBGs38DdE55_ant_pvrrKmv5IjBvJmMyRYPG4LEOR6C_UtbmYzPPcSmXODrrZHvndo3_PaR7KJ-o8ZwYe2KlV5VTtW7hhuEHJvHfkG0k6y7AUocRKDoQI65v5-_0XABVhCejR4RhYCd5Hl-zORcx29w97w3Ry7ThOoHDmm286YiCgDB3pkhkuXNlT_P3x7BPqVwP80yK8TdcnSqL6wPwtSJLPNvX34m7e5GYVgk9X1Y0HG-gzAer7h-eqBMnEJJkphmV3W-eSwyra8S5gFD_czO3xVbgBxoYJNiVqRM2ubDyzj6ykmhA0_H0lLS2WGGZZEnpSGafA70ELXNU3hXoefxqLaupR2juBNrW2HLx4Y6lGC9SNHmll-G4DxkPmGrNFrdzN2noOe8jYlX3fUu9hKeHe8G4Q2cybvJajrfKcpEjvch0Iw3WdB9E5Lv6CZqlVdWHHThHEXPgWDzL5mydgb7TVQz4gQGpwsm4Y57w4s-3FclLxJdaOZnyJTAV_FA2GVWPPDZkYfd_dY8FMehpa_YuN2iQCy-JxpyaANMJorTUS_pnD0Mv65ZWRNZEHTZMGZs9-hfRkIs5ElcTwN7vDVd1WKiuicvhw_ab7aCM_MvxDO2lwWRY-ybPn2TRyZYIMP7S2-ZT7uBoIrS3qNoxsWMSTjzxMDonVyk",
+            // access_token,
+            props.GetListAllStore.access_token,
         },
       })
       .then(function (response) {
@@ -96,14 +110,51 @@ const Edit = observer((props) => {
       });
   };
 
+  const requestUpdateStatus = async (event) => {
+    event.preventDefault();
+    let formData = new FormData();
+    if (event.target.id === "submitTranslatorSave") {
+      formData.append("status_id", refProjName.current.value);
+    }
+    if (event.target.id === "submitHeadApprove") {
+      formData.append("status_id", 2);
+    }
+    if (event.target.id === "submitHeadReject") {
+      formData.append("status_id", 5);
+    }
+    formData.append("id", props.GetListAllStore.id);
+    await axios
+      .post("/api/translate/v1/status", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization:
+            "Bearer " +
+            // "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiI5MGRmMjQ1YS1hNjFlLTQ2M2QtOGFkNC02OWE5ZGJjODkzNTIiLCJqdGkiOiJhOGJiOTYwNjYyN2I1M2RmMWU2OGUyYjdhMGY5NmNiMzEzOGMxODY5ZjI1MzdhODlhNjYxZWVhOGMzMDRlNDZjMDRmMDBhMGRmNDJlMWRjZSIsImlhdCI6MTYyMjE3NjExOSwibmJmIjoxNjIyMTc2MTE5LCJleHAiOjE2NTM3MTIxMTksInN1YiI6IjUxNiIsInNjb3BlcyI6W119.U0X7o1hnzBGs38DdE55_ant_pvrrKmv5IjBvJmMyRYPG4LEOR6C_UtbmYzPPcSmXODrrZHvndo3_PaR7KJ-o8ZwYe2KlV5VTtW7hhuEHJvHfkG0k6y7AUocRKDoQI65v5-_0XABVhCejR4RhYCd5Hl-zORcx29w97w3Ry7ThOoHDmm286YiCgDB3pkhkuXNlT_P3x7BPqVwP80yK8TdcnSqL6wPwtSJLPNvX34m7e5GYVgk9X1Y0HG-gzAer7h-eqBMnEJJkphmV3W-eSwyra8S5gFD_czO3xVbgBxoYJNiVqRM2ubDyzj6ykmhA0_H0lLS2WGGZZEnpSGafA70ELXNU3hXoefxqLaupR2juBNrW2HLx4Y6lGC9SNHmll-G4DxkPmGrNFrdzN2noOe8jYlX3fUu9hKeHe8G4Q2cybvJajrfKcpEjvch0Iw3WdB9E5Lv6CZqlVdWHHThHEXPgWDzL5mydgb7TVQz4gQGpwsm4Y57w4s-3FclLxJdaOZnyJTAV_FA2GVWPPDZkYfd_dY8FMehpa_YuN2iQCy-JxpyaANMJorTUS_pnD0Mv65ZWRNZEHTZMGZs9-hfRkIs5ElcTwN7vDVd1WKiuicvhw_ab7aCM_MvxDO2lwWRY-ybPn2TRyZYIMP7S2-ZT7uBoIrS3qNoxsWMSTjzxMDonVyk",
+            // access_token,
+            props.GetListAllStore.access_token,
+        },
+      })
+      .then(function (response) {
+        if (response.status === 200) {
+          console.log(response);
+          handleClose();
+        }
+      })
+      .catch(function (error) {
+        console.log("Error", error);
+        alert(error);
+      });
+  };
+
   const getProject = () => {
     axios
-      .get("https://api.rihes.cmu.ac.th/api/translate/v1/projects", {
+      .get("/api/translate/v1/projects", {
         headers: {
           Authorization:
             "Bearer " +
-            "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiI5MGRmMjQ1YS1hNjFlLTQ2M2QtOGFkNC02OWE5ZGJjODkzNTIiLCJqdGkiOiJhOGJiOTYwNjYyN2I1M2RmMWU2OGUyYjdhMGY5NmNiMzEzOGMxODY5ZjI1MzdhODlhNjYxZWVhOGMzMDRlNDZjMDRmMDBhMGRmNDJlMWRjZSIsImlhdCI6MTYyMjE3NjExOSwibmJmIjoxNjIyMTc2MTE5LCJleHAiOjE2NTM3MTIxMTksInN1YiI6IjUxNiIsInNjb3BlcyI6W119.U0X7o1hnzBGs38DdE55_ant_pvrrKmv5IjBvJmMyRYPG4LEOR6C_UtbmYzPPcSmXODrrZHvndo3_PaR7KJ-o8ZwYe2KlV5VTtW7hhuEHJvHfkG0k6y7AUocRKDoQI65v5-_0XABVhCejR4RhYCd5Hl-zORcx29w97w3Ry7ThOoHDmm286YiCgDB3pkhkuXNlT_P3x7BPqVwP80yK8TdcnSqL6wPwtSJLPNvX34m7e5GYVgk9X1Y0HG-gzAer7h-eqBMnEJJkphmV3W-eSwyra8S5gFD_czO3xVbgBxoYJNiVqRM2ubDyzj6ykmhA0_H0lLS2WGGZZEnpSGafA70ELXNU3hXoefxqLaupR2juBNrW2HLx4Y6lGC9SNHmll-G4DxkPmGrNFrdzN2noOe8jYlX3fUu9hKeHe8G4Q2cybvJajrfKcpEjvch0Iw3WdB9E5Lv6CZqlVdWHHThHEXPgWDzL5mydgb7TVQz4gQGpwsm4Y57w4s-3FclLxJdaOZnyJTAV_FA2GVWPPDZkYfd_dY8FMehpa_YuN2iQCy-JxpyaANMJorTUS_pnD0Mv65ZWRNZEHTZMGZs9-hfRkIs5ElcTwN7vDVd1WKiuicvhw_ab7aCM_MvxDO2lwWRY-ybPn2TRyZYIMP7S2-ZT7uBoIrS3qNoxsWMSTjzxMDonVyk",
-          // access_token,
+            // "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiI5MGRmMjQ1YS1hNjFlLTQ2M2QtOGFkNC02OWE5ZGJjODkzNTIiLCJqdGkiOiJhOGJiOTYwNjYyN2I1M2RmMWU2OGUyYjdhMGY5NmNiMzEzOGMxODY5ZjI1MzdhODlhNjYxZWVhOGMzMDRlNDZjMDRmMDBhMGRmNDJlMWRjZSIsImlhdCI6MTYyMjE3NjExOSwibmJmIjoxNjIyMTc2MTE5LCJleHAiOjE2NTM3MTIxMTksInN1YiI6IjUxNiIsInNjb3BlcyI6W119.U0X7o1hnzBGs38DdE55_ant_pvrrKmv5IjBvJmMyRYPG4LEOR6C_UtbmYzPPcSmXODrrZHvndo3_PaR7KJ-o8ZwYe2KlV5VTtW7hhuEHJvHfkG0k6y7AUocRKDoQI65v5-_0XABVhCejR4RhYCd5Hl-zORcx29w97w3Ry7ThOoHDmm286YiCgDB3pkhkuXNlT_P3x7BPqVwP80yK8TdcnSqL6wPwtSJLPNvX34m7e5GYVgk9X1Y0HG-gzAer7h-eqBMnEJJkphmV3W-eSwyra8S5gFD_czO3xVbgBxoYJNiVqRM2ubDyzj6ykmhA0_H0lLS2WGGZZEnpSGafA70ELXNU3hXoefxqLaupR2juBNrW2HLx4Y6lGC9SNHmll-G4DxkPmGrNFrdzN2noOe8jYlX3fUu9hKeHe8G4Q2cybvJajrfKcpEjvch0Iw3WdB9E5Lv6CZqlVdWHHThHEXPgWDzL5mydgb7TVQz4gQGpwsm4Y57w4s-3FclLxJdaOZnyJTAV_FA2GVWPPDZkYfd_dY8FMehpa_YuN2iQCy-JxpyaANMJorTUS_pnD0Mv65ZWRNZEHTZMGZs9-hfRkIs5ElcTwN7vDVd1WKiuicvhw_ab7aCM_MvxDO2lwWRY-ybPn2TRyZYIMP7S2-ZT7uBoIrS3qNoxsWMSTjzxMDonVyk",
+            // access_token,
+            props.GetListAllStore.access_token,
         },
       })
       .then(function (response) {
@@ -172,10 +223,9 @@ const Edit = observer((props) => {
   };
 
   const requestSubmit = async (event) => {
-    if(status_id === "0"){
+    if (status_id === "0") {
       props.GetListAllStore.storeSuccessTitle("บันทึกแบบฟอร์มสำเร็จ");
-    }
-    else {
+    } else {
       props.GetListAllStore.storeSuccessTitle("ส่งแบบฟอร์มสำเร็จ");
     }
     event.preventDefault();
@@ -193,18 +243,19 @@ const Edit = observer((props) => {
       formData.append("attachment[" + i + "]", file);
     }
     formData.append("status_id", status_id);
+    // axios.defaults.withCredentials = true;
     await axios
       .post(
-        "https://api.rihes.cmu.ac.th/api/translate/v1/translate/" +
-          props.GetListAllStore.id,
+        "/api/translate/v1/translate/" + props.GetListAllStore.id,
         formData,
         {
           headers: {
             "Content-Type": "multipart/form-data",
             Authorization:
               "Bearer " +
-              "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiI5MGRmMjQ1YS1hNjFlLTQ2M2QtOGFkNC02OWE5ZGJjODkzNTIiLCJqdGkiOiJhOGJiOTYwNjYyN2I1M2RmMWU2OGUyYjdhMGY5NmNiMzEzOGMxODY5ZjI1MzdhODlhNjYxZWVhOGMzMDRlNDZjMDRmMDBhMGRmNDJlMWRjZSIsImlhdCI6MTYyMjE3NjExOSwibmJmIjoxNjIyMTc2MTE5LCJleHAiOjE2NTM3MTIxMTksInN1YiI6IjUxNiIsInNjb3BlcyI6W119.U0X7o1hnzBGs38DdE55_ant_pvrrKmv5IjBvJmMyRYPG4LEOR6C_UtbmYzPPcSmXODrrZHvndo3_PaR7KJ-o8ZwYe2KlV5VTtW7hhuEHJvHfkG0k6y7AUocRKDoQI65v5-_0XABVhCejR4RhYCd5Hl-zORcx29w97w3Ry7ThOoHDmm286YiCgDB3pkhkuXNlT_P3x7BPqVwP80yK8TdcnSqL6wPwtSJLPNvX34m7e5GYVgk9X1Y0HG-gzAer7h-eqBMnEJJkphmV3W-eSwyra8S5gFD_czO3xVbgBxoYJNiVqRM2ubDyzj6ykmhA0_H0lLS2WGGZZEnpSGafA70ELXNU3hXoefxqLaupR2juBNrW2HLx4Y6lGC9SNHmll-G4DxkPmGrNFrdzN2noOe8jYlX3fUu9hKeHe8G4Q2cybvJajrfKcpEjvch0Iw3WdB9E5Lv6CZqlVdWHHThHEXPgWDzL5mydgb7TVQz4gQGpwsm4Y57w4s-3FclLxJdaOZnyJTAV_FA2GVWPPDZkYfd_dY8FMehpa_YuN2iQCy-JxpyaANMJorTUS_pnD0Mv65ZWRNZEHTZMGZs9-hfRkIs5ElcTwN7vDVd1WKiuicvhw_ab7aCM_MvxDO2lwWRY-ybPn2TRyZYIMP7S2-ZT7uBoIrS3qNoxsWMSTjzxMDonVyk",
-            // access_token,
+              // "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiI5MGRmMjQ1YS1hNjFlLTQ2M2QtOGFkNC02OWE5ZGJjODkzNTIiLCJqdGkiOiJhOGJiOTYwNjYyN2I1M2RmMWU2OGUyYjdhMGY5NmNiMzEzOGMxODY5ZjI1MzdhODlhNjYxZWVhOGMzMDRlNDZjMDRmMDBhMGRmNDJlMWRjZSIsImlhdCI6MTYyMjE3NjExOSwibmJmIjoxNjIyMTc2MTE5LCJleHAiOjE2NTM3MTIxMTksInN1YiI6IjUxNiIsInNjb3BlcyI6W119.U0X7o1hnzBGs38DdE55_ant_pvrrKmv5IjBvJmMyRYPG4LEOR6C_UtbmYzPPcSmXODrrZHvndo3_PaR7KJ-o8ZwYe2KlV5VTtW7hhuEHJvHfkG0k6y7AUocRKDoQI65v5-_0XABVhCejR4RhYCd5Hl-zORcx29w97w3Ry7ThOoHDmm286YiCgDB3pkhkuXNlT_P3x7BPqVwP80yK8TdcnSqL6wPwtSJLPNvX34m7e5GYVgk9X1Y0HG-gzAer7h-eqBMnEJJkphmV3W-eSwyra8S5gFD_czO3xVbgBxoYJNiVqRM2ubDyzj6ykmhA0_H0lLS2WGGZZEnpSGafA70ELXNU3hXoefxqLaupR2juBNrW2HLx4Y6lGC9SNHmll-G4DxkPmGrNFrdzN2noOe8jYlX3fUu9hKeHe8G4Q2cybvJajrfKcpEjvch0Iw3WdB9E5Lv6CZqlVdWHHThHEXPgWDzL5mydgb7TVQz4gQGpwsm4Y57w4s-3FclLxJdaOZnyJTAV_FA2GVWPPDZkYfd_dY8FMehpa_YuN2iQCy-JxpyaANMJorTUS_pnD0Mv65ZWRNZEHTZMGZs9-hfRkIs5ElcTwN7vDVd1WKiuicvhw_ab7aCM_MvxDO2lwWRY-ybPn2TRyZYIMP7S2-ZT7uBoIrS3qNoxsWMSTjzxMDonVyk",
+              // access_token,
+              props.GetListAllStore.access_token,
           },
         }
       )
@@ -217,9 +268,6 @@ const Edit = observer((props) => {
       .catch(function (error) {
         console.log("Error", error);
         alert(error);
-      })
-      .then(function () {
-        // always executed
       });
   };
 
@@ -227,69 +275,55 @@ const Edit = observer((props) => {
     props.GetListAllStore.storeSuccessTitle("ลบแบบฟอร์มสำเร็จ");
     event.preventDefault();
     await axios
-      .delete(
-        "https://api.rihes.cmu.ac.th/api/translate/v1/translate/" +
-          props.GetListAllStore.id,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization:
-              "Bearer " +
-              "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiI5MGRmMjQ1YS1hNjFlLTQ2M2QtOGFkNC02OWE5ZGJjODkzNTIiLCJqdGkiOiJhOGJiOTYwNjYyN2I1M2RmMWU2OGUyYjdhMGY5NmNiMzEzOGMxODY5ZjI1MzdhODlhNjYxZWVhOGMzMDRlNDZjMDRmMDBhMGRmNDJlMWRjZSIsImlhdCI6MTYyMjE3NjExOSwibmJmIjoxNjIyMTc2MTE5LCJleHAiOjE2NTM3MTIxMTksInN1YiI6IjUxNiIsInNjb3BlcyI6W119.U0X7o1hnzBGs38DdE55_ant_pvrrKmv5IjBvJmMyRYPG4LEOR6C_UtbmYzPPcSmXODrrZHvndo3_PaR7KJ-o8ZwYe2KlV5VTtW7hhuEHJvHfkG0k6y7AUocRKDoQI65v5-_0XABVhCejR4RhYCd5Hl-zORcx29w97w3Ry7ThOoHDmm286YiCgDB3pkhkuXNlT_P3x7BPqVwP80yK8TdcnSqL6wPwtSJLPNvX34m7e5GYVgk9X1Y0HG-gzAer7h-eqBMnEJJkphmV3W-eSwyra8S5gFD_czO3xVbgBxoYJNiVqRM2ubDyzj6ykmhA0_H0lLS2WGGZZEnpSGafA70ELXNU3hXoefxqLaupR2juBNrW2HLx4Y6lGC9SNHmll-G4DxkPmGrNFrdzN2noOe8jYlX3fUu9hKeHe8G4Q2cybvJajrfKcpEjvch0Iw3WdB9E5Lv6CZqlVdWHHThHEXPgWDzL5mydgb7TVQz4gQGpwsm4Y57w4s-3FclLxJdaOZnyJTAV_FA2GVWPPDZkYfd_dY8FMehpa_YuN2iQCy-JxpyaANMJorTUS_pnD0Mv65ZWRNZEHTZMGZs9-hfRkIs5ElcTwN7vDVd1WKiuicvhw_ab7aCM_MvxDO2lwWRY-ybPn2TRyZYIMP7S2-ZT7uBoIrS3qNoxsWMSTjzxMDonVyk",
+      .delete("/api/translate/v1/translate/" + props.GetListAllStore.id, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization:
+            "Bearer " +
+            // "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiI5MGRmMjQ1YS1hNjFlLTQ2M2QtOGFkNC02OWE5ZGJjODkzNTIiLCJqdGkiOiJhOGJiOTYwNjYyN2I1M2RmMWU2OGUyYjdhMGY5NmNiMzEzOGMxODY5ZjI1MzdhODlhNjYxZWVhOGMzMDRlNDZjMDRmMDBhMGRmNDJlMWRjZSIsImlhdCI6MTYyMjE3NjExOSwibmJmIjoxNjIyMTc2MTE5LCJleHAiOjE2NTM3MTIxMTksInN1YiI6IjUxNiIsInNjb3BlcyI6W119.U0X7o1hnzBGs38DdE55_ant_pvrrKmv5IjBvJmMyRYPG4LEOR6C_UtbmYzPPcSmXODrrZHvndo3_PaR7KJ-o8ZwYe2KlV5VTtW7hhuEHJvHfkG0k6y7AUocRKDoQI65v5-_0XABVhCejR4RhYCd5Hl-zORcx29w97w3Ry7ThOoHDmm286YiCgDB3pkhkuXNlT_P3x7BPqVwP80yK8TdcnSqL6wPwtSJLPNvX34m7e5GYVgk9X1Y0HG-gzAer7h-eqBMnEJJkphmV3W-eSwyra8S5gFD_czO3xVbgBxoYJNiVqRM2ubDyzj6ykmhA0_H0lLS2WGGZZEnpSGafA70ELXNU3hXoefxqLaupR2juBNrW2HLx4Y6lGC9SNHmll-G4DxkPmGrNFrdzN2noOe8jYlX3fUu9hKeHe8G4Q2cybvJajrfKcpEjvch0Iw3WdB9E5Lv6CZqlVdWHHThHEXPgWDzL5mydgb7TVQz4gQGpwsm4Y57w4s-3FclLxJdaOZnyJTAV_FA2GVWPPDZkYfd_dY8FMehpa_YuN2iQCy-JxpyaANMJorTUS_pnD0Mv65ZWRNZEHTZMGZs9-hfRkIs5ElcTwN7vDVd1WKiuicvhw_ab7aCM_MvxDO2lwWRY-ybPn2TRyZYIMP7S2-ZT7uBoIrS3qNoxsWMSTjzxMDonVyk",
             // access_token,
-          },
-        }
-      )
+            props.GetListAllStore.access_token,
+        },
+      })
       .then(function (response) {
         console.log(response);
         handleClose();
       })
       .catch(function (error) {
         console.log("Error", error);
-      })
-      .then(function () {
-        // always executed
       });
   };
 
-  const handleSubmitDraft = (event) => {
-    setStatusid("0");
-    const form = event.target;
-    props.AddNewStore.storeValidate(true);
-    if (form.checkValidity() === false) {
-      event.preventDefault();
-      event.stopPropagation();
-      props.AddNewStore.storeValidate(false);
-      props.AddNewStore.clearIsFirst();
-    } else {
-      setValidated(true);
-      props.AddNewStore.storeIsFirst(props.AddNewStore.isFirst + 1);
-      if (props.AddNewStore.isValidate && props.AddNewStore.isFirst === 2) {
-        event.preventDefault();
-        requestSubmit(event);
-        props.AddNewStore.clearIsFirst();
-      }
+  const handleSubmit = async (event) => {
+    if (event.target.id === "submitformSave") {
+      setStatusid("0");
     }
-  };
-  const handleSubmitSend = (event) => {
-    setStatusid("1");
-    const form = event.target;
-    props.AddNewStore.storeValidate(true);
-    if (form.checkValidity() === false) {
-      event.preventDefault();
-      event.stopPropagation();
-      props.AddNewStore.storeValidate(false);
-      props.AddNewStore.clearIsFirst();
-    } else {
-      setValidated(true);
-      props.AddNewStore.storeIsFirst(props.AddNewStore.isFirst + 1);
-      if (props.AddNewStore.isValidate && props.AddNewStore.isFirst === 2) {
+    if (event.target.id === "submitformSend") {
+      setStatusid("1");
+    }
+    if (event.target.id === "submitformDelete") {
+      deleteSubmit(event);
+    }
+    try {
+      const form = event.currentTarget;
+      props.AddNewStore.storeValidate(true);
+      if (!form.checkValidity()) {
+        debugger;
         event.preventDefault();
-        let trace = new Error().stack;
-        console.log('The link was clicked.' , trace);
-        requestSubmit(event);
+        event.stopPropagation();
+        props.AddNewStore.storeValidate(false);
         props.AddNewStore.clearIsFirst();
+      } else {
+        setValidated(true);
+        props.AddNewStore.storeIsFirst(props.AddNewStore.isFirst + 1);
+        if (props.AddNewStore.isValidate && props.AddNewStore.isFirst === 2) {
+          requestSubmit(event);
+          props.AddNewStore.clearIsFirst();
+          return false;
+        }
       }
+    } catch (error) {
+      alert(error);
     }
   };
 
@@ -297,7 +331,7 @@ const Edit = observer((props) => {
     <Form
       noValidate
       validated={validated}
-      onSubmit={handleSubmitDraft || handleSubmitSend}
+      onSubmit={handleSubmit}
       ref={refForm}
     >
       <div class="animated fadeInRight m-t">
@@ -695,31 +729,33 @@ const Edit = observer((props) => {
                 ปิด
               </Button> */}
               <Button
-                id="submitform1"
+                id="submitformSave"
                 type="submit"
                 class="btn  btn-primary"
                 data-toggle="tooltip"
                 data-placement="top"
                 title="บันทึก"
-                onClick={(e) => handleSubmitDraft(e)}
+                onClick={(e) => handleSubmit(e)}
               >
                 <i class="fa fa-save mr-2"></i>บันทึก
               </Button>
               <Button
+                id="submitformSend"
                 variant="success"
                 type="submit"
                 class="btn  btn-primary"
-                onClick={(e) => handleSubmitSend(e)}
                 style={{ marginLeft: 16 }}
+                onClick={(e) => handleSubmit(e)}
               >
                 <i class="fa fa-send mr-2"></i>ส่ง
               </Button>
 
               <Button
+                id="submitformDelete"
                 variant="danger"
                 type="submit"
                 class="btn  btn-primary"
-                onClick={(e) => deleteSubmit(e)}
+                onClick={(e) => handleSubmit(e)}
                 style={{ marginLeft: 16 }}
               >
                 <i class="fa fa-trash mr-2"></i>ลบ
@@ -746,20 +782,24 @@ const Edit = observer((props) => {
               </label>
               <div class="col-sm-10 mt-3 mb-3">
                 <select
-                  // ref={refProjName}
+                  ref={refTranslatorStatus}
                   class="custom-select"
-                  value={selectedProjectName}
+                  value={selectedStatus}
                   onChange={(e) =>
-                    setSelectedProjectName(
-                      projName.find(
-                        (projName) => projName.id === e.target.value
+                    setSelectedStatus(
+                      translatorStatus.find(
+                        (translatorStatus) =>
+                          translatorStatus.id === e.target.value
                       )
                     )
                   }
                 >
-                  {projName.map((projName) => (
-                    <option key={projName.id} value={projName.name}>
-                      {projName.name}
+                  {translatorStatus.map((translatorStatus) => (
+                    <option
+                      key={translatorStatus.id}
+                      value={translatorStatus.id}
+                    >
+                      {translatorStatus.name}
                     </option>
                   ))}
                 </select>
@@ -768,22 +808,17 @@ const Edit = observer((props) => {
             </div>
 
             <div class="mail-body text-right tooltip-demo mb-3">
-              {/* <Button
-                variant="secondary"
-                onClick={() => handleClose()}
-                style={{ marginRight: 16 }}
-              >
-                ปิด
-              </Button> */}
-
               <Button
-                id="submitform1"
+                id="submitTranslatorSave"
                 type="submit"
                 class="btn  btn-primary"
                 data-toggle="tooltip"
                 data-placement="top"
                 title="บันทึก"
-                // onClick={(e) => handleSubmitDraft(e)}
+                disabled={
+                  props.GetListAllStore.level.includes("pm") ? false : true
+                }
+                onClick={(e) => requestUpdateStatus(e)}
               >
                 <i class="fa fa-save mr-2"></i>บันทึก
               </Button>
@@ -805,27 +840,31 @@ const Edit = observer((props) => {
               style={{ marginTop: 32 }}
             >
               <Button
+                id="submitHeadApprove"
                 variant="success"
-                id="submitform1"
                 type="submit"
                 class="btn  btn-success mr-3"
                 data-toggle="tooltip"
                 data-placement="top"
-                title="บันทึก"
-                // onClick={(e) => handleSubmitDraft(e)}
+                disabled={
+                  props.GetListAllStore.level.includes("head") ? false : true
+                }
+                onClick={(e) => requestUpdateStatus(e)}
               >
                 <i class="fa fa-check mr-2"></i>อนุญาต
               </Button>
               <Button
+                id="submitHeadReject"
                 variant="danger"
-                id="submitform1"
                 type="submit"
                 class="btn  btn-danger ml-3 "
                 data-toggle="tooltip"
                 data-placement="top"
-                title="บันทึก"
+                disabled={
+                  props.GetListAllStore.level.includes("head") ? false : true
+                }
                 style={{ marginLeft: 16 }}
-                // onClick={(e) => handleSubmitDraft(e)}
+                onClick={(e) => requestUpdateStatus(e)}
               >
                 <i class="fa fa-times-circle mr-2"></i>ไม่อนุญาต
               </Button>
