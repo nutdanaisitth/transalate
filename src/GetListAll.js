@@ -6,6 +6,7 @@ import { observer, inject } from "mobx-react";
 import axios from "axios";
 import moment from "moment";
 import Edit from "./Edit";
+import  { Redirect, Link, BrowserRouter } from 'react-router-dom'
 import logo from "./assets/success.gif";
 import "./index.css";
 
@@ -58,21 +59,9 @@ function SuccessModal(props) {
 
 const RenderTabs = observer((props) => {
   moment.locale("th");
-  useEffect(() => {
-    props.GetListAllStore.storeAccessToken(access_token);
-    if (props.AddNewStore.isClose) {
-      // document.getElementById("textTitle").innerHTML = 'sdssd'
-      setsuccessModal(true);
-    }
-    handleCloseAddnew();
-    handleCloseEdit();
-    getStatusId();
-    getUser();
-    getListAll(statusRequest); // eslint-disable-line
-  }, [props.AddNewStore.isClose]); // eslint-disable-line
   const [dataRes, setData] = useState([]);
   const [dataStatus, setDataStatus] = useState([]); // eslint-disable-line
-  const [statusId, storeStatusId] = useState([]); // eslint-disable-line
+  let [statusId] = useState([]); // eslint-disable-line
   const [level] = useState([]); // eslint-disable-line
   const [statusRequest, storeStatusRequest] = useState(0);
   const [modalAddNewShow, setAddNewModalShow] = useState(false);
@@ -83,15 +72,29 @@ const RenderTabs = observer((props) => {
     "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiI5MGRmMjQ1YS1hNjFlLTQ2M2QtOGFkNC02OWE5ZGJjODkzNTIiLCJqdGkiOiJhOGJiOTYwNjYyN2I1M2RmMWU2OGUyYjdhMGY5NmNiMzEzOGMxODY5ZjI1MzdhODlhNjYxZWVhOGMzMDRlNDZjMDRmMDBhMGRmNDJlMWRjZSIsImlhdCI6MTYyMjE3NjExOSwibmJmIjoxNjIyMTc2MTE5LCJleHAiOjE2NTM3MTIxMTksInN1YiI6IjUxNiIsInNjb3BlcyI6W119.U0X7o1hnzBGs38DdE55_ant_pvrrKmv5IjBvJmMyRYPG4LEOR6C_UtbmYzPPcSmXODrrZHvndo3_PaR7KJ-o8ZwYe2KlV5VTtW7hhuEHJvHfkG0k6y7AUocRKDoQI65v5-_0XABVhCejR4RhYCd5Hl-zORcx29w97w3Ry7ThOoHDmm286YiCgDB3pkhkuXNlT_P3x7BPqVwP80yK8TdcnSqL6wPwtSJLPNvX34m7e5GYVgk9X1Y0HG-gzAer7h-eqBMnEJJkphmV3W-eSwyra8S5gFD_czO3xVbgBxoYJNiVqRM2ubDyzj6ykmhA0_H0lLS2WGGZZEnpSGafA70ELXNU3hXoefxqLaupR2juBNrW2HLx4Y6lGC9SNHmll-G4DxkPmGrNFrdzN2noOe8jYlX3fUu9hKeHe8G4Q2cybvJajrfKcpEjvch0Iw3WdB9E5Lv6CZqlVdWHHThHEXPgWDzL5mydgb7TVQz4gQGpwsm4Y57w4s-3FclLxJdaOZnyJTAV_FA2GVWPPDZkYfd_dY8FMehpa_YuN2iQCy-JxpyaANMJorTUS_pnD0Mv65ZWRNZEHTZMGZs9-hfRkIs5ElcTwN7vDVd1WKiuicvhw_ab7aCM_MvxDO2lwWRY-ybPn2TRyZYIMP7S2-ZT7uBoIrS3qNoxsWMSTjzxMDonVyk"
   );
 
+  useEffect(() => {
+    getStatusId();
+  }, []);
+
+  useEffect(() => {
+    props.GetListAllStore.storeAccessToken(access_token);
+    if (props.AddNewStore.isClose) {
+      setsuccessModal(true);
+    }
+    handleCloseAddnew();
+    handleCloseEdit();
+    getUser();
+    getListAll(statusRequest); // eslint-disable-line
+  }, [props.AddNewStore.isClose]); // eslint-disable-line
+
   const getUser = () => {
     axios
       .get("/api/v1/auth/user", {
         headers: {
           Authorization:
             "Bearer " +
-            // "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiI5MGRmMjQ1YS1hNjFlLTQ2M2QtOGFkNC02OWE5ZGJjODkzNTIiLCJqdGkiOiJhOGJiOTYwNjYyN2I1M2RmMWU2OGUyYjdhMGY5NmNiMzEzOGMxODY5ZjI1MzdhODlhNjYxZWVhOGMzMDRlNDZjMDRmMDBhMGRmNDJlMWRjZSIsImlhdCI6MTYyMjE3NjExOSwibmJmIjoxNjIyMTc2MTE5LCJleHAiOjE2NTM3MTIxMTksInN1YiI6IjUxNiIsInNjb3BlcyI6W119.U0X7o1hnzBGs38DdE55_ant_pvrrKmv5IjBvJmMyRYPG4LEOR6C_UtbmYzPPcSmXODrrZHvndo3_PaR7KJ-o8ZwYe2KlV5VTtW7hhuEHJvHfkG0k6y7AUocRKDoQI65v5-_0XABVhCejR4RhYCd5Hl-zORcx29w97w3Ry7ThOoHDmm286YiCgDB3pkhkuXNlT_P3x7BPqVwP80yK8TdcnSqL6wPwtSJLPNvX34m7e5GYVgk9X1Y0HG-gzAer7h-eqBMnEJJkphmV3W-eSwyra8S5gFD_czO3xVbgBxoYJNiVqRM2ubDyzj6ykmhA0_H0lLS2WGGZZEnpSGafA70ELXNU3hXoefxqLaupR2juBNrW2HLx4Y6lGC9SNHmll-G4DxkPmGrNFrdzN2noOe8jYlX3fUu9hKeHe8G4Q2cybvJajrfKcpEjvch0Iw3WdB9E5Lv6CZqlVdWHHThHEXPgWDzL5mydgb7TVQz4gQGpwsm4Y57w4s-3FclLxJdaOZnyJTAV_FA2GVWPPDZkYfd_dY8FMehpa_YuN2iQCy-JxpyaANMJorTUS_pnD0Mv65ZWRNZEHTZMGZs9-hfRkIs5ElcTwN7vDVd1WKiuicvhw_ab7aCM_MvxDO2lwWRY-ybPn2TRyZYIMP7S2-ZT7uBoIrS3qNoxsWMSTjzxMDonVyk",
-            // access_token,
-            props.GetListAllStore.access_token,
+            access_token,
+            // props.GetListAllStore.access_token,
         },
       })
       .then(function (response) {
@@ -100,15 +103,18 @@ const RenderTabs = observer((props) => {
         for (i = 0; i < data.length; i++) {
           level.push(data[i].level);
         }
-        props.GetListAllStore.storeLevel(level)
+        props.GetListAllStore.storeLevel(level);
       })
       .catch(function (error) {
-        console.log(error);
-        alert(error);
+        debugger
+        console.log(error.message);
+        if(error.message === 'Request failed with status code 401'){
+          window.location.href = 'https://e-work.rihes.cmu.ac.th/'
+        }else{
+          alert(error.message)
+        }
       })
-      .then(function () {
-        // always executed
-      });
+      .then(function () {});
   };
 
   const getListAll = async (status_id) => {
@@ -117,7 +123,6 @@ const RenderTabs = observer((props) => {
         headers: {
           Authorization:
             "Bearer " +
-            // "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiI5MGRmMjQ1YS1hNjFlLTQ2M2QtOGFkNC02OWE5ZGJjODkzNTIiLCJqdGkiOiJhOGJiOTYwNjYyN2I1M2RmMWU2OGUyYjdhMGY5NmNiMzEzOGMxODY5ZjI1MzdhODlhNjYxZWVhOGMzMDRlNDZjMDRmMDBhMGRmNDJlMWRjZSIsImlhdCI6MTYyMjE3NjExOSwibmJmIjoxNjIyMTc2MTE5LCJleHAiOjE2NTM3MTIxMTksInN1YiI6IjUxNiIsInNjb3BlcyI6W119.U0X7o1hnzBGs38DdE55_ant_pvrrKmv5IjBvJmMyRYPG4LEOR6C_UtbmYzPPcSmXODrrZHvndo3_PaR7KJ-o8ZwYe2KlV5VTtW7hhuEHJvHfkG0k6y7AUocRKDoQI65v5-_0XABVhCejR4RhYCd5Hl-zORcx29w97w3Ry7ThOoHDmm286YiCgDB3pkhkuXNlT_P3x7BPqVwP80yK8TdcnSqL6wPwtSJLPNvX34m7e5GYVgk9X1Y0HG-gzAer7h-eqBMnEJJkphmV3W-eSwyra8S5gFD_czO3xVbgBxoYJNiVqRM2ubDyzj6ykmhA0_H0lLS2WGGZZEnpSGafA70ELXNU3hXoefxqLaupR2juBNrW2HLx4Y6lGC9SNHmll-G4DxkPmGrNFrdzN2noOe8jYlX3fUu9hKeHe8G4Q2cybvJajrfKcpEjvch0Iw3WdB9E5Lv6CZqlVdWHHThHEXPgWDzL5mydgb7TVQz4gQGpwsm4Y57w4s-3FclLxJdaOZnyJTAV_FA2GVWPPDZkYfd_dY8FMehpa_YuN2iQCy-JxpyaANMJorTUS_pnD0Mv65ZWRNZEHTZMGZs9-hfRkIs5ElcTwN7vDVd1WKiuicvhw_ab7aCM_MvxDO2lwWRY-ybPn2TRyZYIMP7S2-ZT7uBoIrS3qNoxsWMSTjzxMDonVyk",
             access_token,
         },
       })
@@ -131,21 +136,25 @@ const RenderTabs = observer((props) => {
         }
       })
       .catch(function (error) {
-        console.log(error);
-        alert(error);
+        console.log(error)
+        if(error.message === 'Request failed with status code 401'){
+          window.location.href = 'https://e-work.rihes.cmu.ac.th/'
+        }else{
+          alert(error.message)
+        }
+        // alert(error);
       })
       .then(function () {
         // always executed
       });
   };
 
-  const getStatusId = async () => {
-    await axios
+  const getStatusId = () => {
+    axios
       .get("/api/translate/v1/status_user", {
         headers: {
           Authorization:
             "Bearer " +
-            // "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiI5MGRmMjQ1YS1hNjFlLTQ2M2QtOGFkNC02OWE5ZGJjODkzNTIiLCJqdGkiOiJhOGJiOTYwNjYyN2I1M2RmMWU2OGUyYjdhMGY5NmNiMzEzOGMxODY5ZjI1MzdhODlhNjYxZWVhOGMzMDRlNDZjMDRmMDBhMGRmNDJlMWRjZSIsImlhdCI6MTYyMjE3NjExOSwibmJmIjoxNjIyMTc2MTE5LCJleHAiOjE2NTM3MTIxMTksInN1YiI6IjUxNiIsInNjb3BlcyI6W119.U0X7o1hnzBGs38DdE55_ant_pvrrKmv5IjBvJmMyRYPG4LEOR6C_UtbmYzPPcSmXODrrZHvndo3_PaR7KJ-o8ZwYe2KlV5VTtW7hhuEHJvHfkG0k6y7AUocRKDoQI65v5-_0XABVhCejR4RhYCd5Hl-zORcx29w97w3Ry7ThOoHDmm286YiCgDB3pkhkuXNlT_P3x7BPqVwP80yK8TdcnSqL6wPwtSJLPNvX34m7e5GYVgk9X1Y0HG-gzAer7h-eqBMnEJJkphmV3W-eSwyra8S5gFD_czO3xVbgBxoYJNiVqRM2ubDyzj6ykmhA0_H0lLS2WGGZZEnpSGafA70ELXNU3hXoefxqLaupR2juBNrW2HLx4Y6lGC9SNHmll-G4DxkPmGrNFrdzN2noOe8jYlX3fUu9hKeHe8G4Q2cybvJajrfKcpEjvch0Iw3WdB9E5Lv6CZqlVdWHHThHEXPgWDzL5mydgb7TVQz4gQGpwsm4Y57w4s-3FclLxJdaOZnyJTAV_FA2GVWPPDZkYfd_dY8FMehpa_YuN2iQCy-JxpyaANMJorTUS_pnD0Mv65ZWRNZEHTZMGZs9-hfRkIs5ElcTwN7vDVd1WKiuicvhw_ab7aCM_MvxDO2lwWRY-ybPn2TRyZYIMP7S2-ZT7uBoIrS3qNoxsWMSTjzxMDonVyk",
             access_token,
         },
       })
@@ -153,18 +162,18 @@ const RenderTabs = observer((props) => {
         if (response.status === 200) {
           const data = response.data;
           console.log(response);
-          setDataStatus(data);
-          for (i = 0; i < data.length; i++) {
-            statusId.push(data[i].id);
-          }
-          
-        } else {
-          alert(response.statusText);
+          setDataStatus(data)
+        
         }
       })
       .catch(function (error) {
         console.log(error);
-        alert(error);
+        if(error.message === 'Request failed with status code 401'){
+          window.location.href = 'https://e-work.rihes.cmu.ac.th/'
+        }else{
+          alert(error.message)
+        }
+        // alert(error);
       })
       .then(function () {
         // always executed
@@ -258,7 +267,6 @@ const RenderTabs = observer((props) => {
             {Tables()}
           </Tab>
         )}
-
         {statusId.includes(1) && (
           <Tab eventKey="request" title="ส่ง">
             {Tables()}
@@ -287,6 +295,12 @@ const RenderTabs = observer((props) => {
       </Tabs>
     );
   };
+
+
+  var j;
+  for (j = 0; j < dataStatus.length; j++) {
+    statusId.push(dataStatus[j].id);
+  }
 
   var rows = [];
   var i;
@@ -396,22 +410,18 @@ const RenderTabs = observer((props) => {
     };
 
     return (
-      <div>
-        {
-          <MDBDataTable
-            responsive
-            btn
-            striped
-            bordered
-            data={data}
-            paginationLabel={["ก่อนหน้า", "ต่อไป"]}
-            noRecordsFoundLabel={"ไม่พบรายการที่ค้นหา"}
-            infoLabel={["แสดงรายการค้นหา", "ถึง", "จาก ทั้งหมด", "รายการ"]}
-            displayEntries={false}
-            noBottomColumns
-          />
-        }
-      </div>
+      <MDBDataTable
+        responsive
+        btn
+        striped
+        bordered
+        data={data}
+        paginationLabel={["ก่อนหน้า", "ต่อไป"]}
+        noRecordsFoundLabel={"ไม่พบรายการที่ค้นหา"}
+        infoLabel={["แสดงรายการค้นหา", "ถึง", "จาก ทั้งหมด", "รายการ"]}
+        displayEntries={false}
+        noBottomColumns
+      />
     );
   };
 

@@ -42,10 +42,6 @@ const Edit = observer((props) => {
   ]);
   const [selectedStatus, setSelectedStatus] = useState(translatorStatus[0]);
 
-  // refTHtoE.current.value = props.GetListAllStore.thaiToEng ? props.GetListAllStore.thaiToEng : 0 ;
-  // refEtoTH.current.value = props.GetListAllStore.engToThai ? props.GetListAllStore.engToThai : 0 ;
-  // refComposeEng.current.value = props.GetListAllStore.composeEng ? props.GetListAllStore.composeEng : 0 ;
-
   const [checkTH, isCheckTH] = useState(
     props.GetListAllStore.thaiToEng ? true : false
   );
@@ -113,14 +109,19 @@ const Edit = observer((props) => {
   const requestUpdateStatus = async (event) => {
     event.preventDefault();
     let formData = new FormData();
+    let i = refTranslatorStatus.current.selectedIndex;
+    let label = refTranslatorStatus.current[i].label;
     if (event.target.id === "submitTranslatorSave") {
-      formData.append("status_id", refProjName.current.value);
+      formData.append("status_id", refTranslatorStatus.current.value);
+      props.GetListAllStore.storeSuccessTitle(label);
     }
     if (event.target.id === "submitHeadApprove") {
       formData.append("status_id", 2);
+      props.GetListAllStore.storeSuccessTitle("อนุญาตงาน");
     }
     if (event.target.id === "submitHeadReject") {
       formData.append("status_id", 5);
+      props.GetListAllStore.storeSuccessTitle("ปฏิเสธงาน");
     }
     formData.append("id", props.GetListAllStore.id);
     await axios
@@ -224,9 +225,9 @@ const Edit = observer((props) => {
 
   const requestSubmit = async (event) => {
     if (status_id === "0") {
-      props.GetListAllStore.storeSuccessTitle("บันทึกแบบฟอร์มสำเร็จ");
+      props.GetListAllStore.storeSuccessTitle("บันทึกแบบฟอร์ม");
     } else {
-      props.GetListAllStore.storeSuccessTitle("ส่งแบบฟอร์มสำเร็จ");
+      props.GetListAllStore.storeSuccessTitle("ส่งแบบฟอร์ม");
     }
     event.preventDefault();
     let attachment = chooseFile;
@@ -272,7 +273,7 @@ const Edit = observer((props) => {
   };
 
   const deleteSubmit = async (event) => {
-    props.GetListAllStore.storeSuccessTitle("ลบแบบฟอร์มสำเร็จ");
+    props.GetListAllStore.storeSuccessTitle("ลบแบบฟอร์ม");
     event.preventDefault();
     await axios
       .delete("/api/translate/v1/translate/" + props.GetListAllStore.id, {
@@ -308,7 +309,6 @@ const Edit = observer((props) => {
       const form = event.currentTarget;
       props.AddNewStore.storeValidate(true);
       if (!form.checkValidity()) {
-        debugger;
         event.preventDefault();
         event.stopPropagation();
         props.AddNewStore.storeValidate(false);
@@ -778,7 +778,7 @@ const Edit = observer((props) => {
                 class="col-sm-2 control-label mt-2 center"
                 style={{ alignSelf: "center" }}
               >
-                แก้ไขสถานะ:
+                สถานะงาน:
               </label>
               <div class="col-sm-10 mt-3 mb-3">
                 <select

@@ -77,7 +77,7 @@ decorate(GetListAllStore, {
   storeEditModal: action,
   storeSuccessTitle: action,
   storeAccessToken: action,
-  storeLevel: action
+  storeLevel: action,
 });
 
 export default new GetListAllStore();
