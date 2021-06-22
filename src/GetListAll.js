@@ -6,7 +6,7 @@ import { observer, inject } from "mobx-react";
 import axios from "axios";
 import moment from "moment";
 import Edit from "./Edit";
-import  { Redirect, Link, BrowserRouter } from 'react-router-dom'
+import { Redirect, Link, BrowserRouter } from "react-router-dom";
 import logo from "./assets/success.gif";
 import "./index.css";
 
@@ -91,10 +91,8 @@ const RenderTabs = observer((props) => {
     axios
       .get("/api/v1/auth/user", {
         headers: {
-          Authorization:
-            "Bearer " +
-            access_token,
-            // props.GetListAllStore.access_token,
+          Authorization: "Bearer " + access_token,
+          // props.GetListAllStore.access_token,
         },
       })
       .then(function (response) {
@@ -106,13 +104,7 @@ const RenderTabs = observer((props) => {
         props.GetListAllStore.storeLevel(level);
       })
       .catch(function (error) {
-        debugger
-        console.log(error.message);
-        if(error.message === 'Request failed with status code 401'){
-          window.location.href = 'https://e-work.rihes.cmu.ac.th/'
-        }else{
-          alert(error.message)
-        }
+        window.location.href = "https://e-work.rihes.cmu.ac.th/";
       })
       .then(function () {});
   };
@@ -121,9 +113,7 @@ const RenderTabs = observer((props) => {
     await axios
       .get("/api/translate/v1/all/status_id/" + status_id, {
         headers: {
-          Authorization:
-            "Bearer " +
-            access_token,
+          Authorization: "Bearer " + access_token,
         },
       })
       .then(function (response) {
@@ -136,13 +126,8 @@ const RenderTabs = observer((props) => {
         }
       })
       .catch(function (error) {
-        console.log(error)
-        if(error.message === 'Request failed with status code 401'){
-          window.location.href = 'https://e-work.rihes.cmu.ac.th/'
-        }else{
-          alert(error.message)
-        }
-        // alert(error);
+        console.log(error);
+        window.location.href = "https://e-work.rihes.cmu.ac.th/";
       })
       .then(function () {
         // always executed
@@ -153,26 +138,19 @@ const RenderTabs = observer((props) => {
     axios
       .get("/api/translate/v1/status_user", {
         headers: {
-          Authorization:
-            "Bearer " +
-            access_token,
+          Authorization: "Bearer " + access_token,
         },
       })
       .then(function (response) {
         if (response.status === 200) {
-          const data = response.data;
+          const data = response.data; 
           console.log(response);
-          setDataStatus(data)
-        
+          setDataStatus(data);
         }
       })
       .catch(function (error) {
         console.log(error);
-        if(error.message === 'Request failed with status code 401'){
-          window.location.href = 'https://e-work.rihes.cmu.ac.th/'
-        }else{
-          alert(error.message)
-        }
+        window.location.href = "https://e-work.rihes.cmu.ac.th/";
         // alert(error);
       })
       .then(function () {
@@ -295,7 +273,6 @@ const RenderTabs = observer((props) => {
       </Tabs>
     );
   };
-
 
   var j;
   for (j = 0; j < dataStatus.length; j++) {
