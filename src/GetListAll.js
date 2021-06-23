@@ -136,14 +136,14 @@ const RenderTabs = observer((props) => {
 
   const getStatusId = () => {
     axios
-      .get("/api/translate/v1/status_user", {
+      .get("/api/translate/v1/status_id", {
         headers: {
           Authorization: "Bearer " + access_token,
         },
       })
       .then(function (response) {
         if (response.status === 200) {
-          const data = response.data; 
+          const data = response.data;
           console.log(response);
           setDataStatus(data);
         }
@@ -286,13 +286,13 @@ const RenderTabs = observer((props) => {
       id: dataRes[i].id,
       useInProject: dataRes[i].project_name,
       projName: dataRes[i].name,
-      price: "-",
+      price: [<div className="rowTable">{"-"} </div>],
       doneAt: moment(new Date(dataRes[i].done_at)).format("LL"),
-      acknowledgeHead: "-",
-      acknowledgeStaff: "-",
-      status: dataRes[i].status_id.map(({ name }) => name),
+      acknowledgeHead: [<div className="rowTable">{"-"}</div>],
+      acknowledgeStaff: [<div className="rowTable">{"-"}</div>],
+      status: [<div className="rowTable">{dataRes[i].status_id.map(({ name }) => name)}</div>],
       editFollowUp: [
-        <div style={{ pointerEvents: "auto" }}>
+        <div className="rowTable">
           <Button
             variant="info"
             size="sm"
@@ -398,6 +398,7 @@ const RenderTabs = observer((props) => {
         infoLabel={["แสดงรายการค้นหา", "ถึง", "จาก ทั้งหมด", "รายการ"]}
         displayEntries={false}
         noBottomColumns
+        entries={20}
       />
     );
   };
