@@ -79,3 +79,20 @@ th .caret-4-desc:after {
   /* width: 200px; */
 }
 
+.rowTableHead {
+  flex-direction: column;
+  text-align: center;
+  display: block;
+  color: blue;
+}
+.rowTable {
+  /* justify-content: center; */
+  text-align: center;
+  display: block;
+  align-content: center;
+  /* margin-top: 8px; */
+}
+
+.subRow {
+  margin-top:-16px;
+}

@@ -6,7 +6,6 @@ import { observer, inject } from "mobx-react";
 import axios from "axios";
 import moment from "moment";
 import Edit from "./Edit";
-import { Redirect, Link, BrowserRouter } from "react-router-dom";
 import logo from "./assets/success.gif";
 import "./index.css";
 
@@ -63,18 +62,14 @@ const RenderTabs = observer((props) => {
   const [dataStatus, setDataStatus] = useState([]); // eslint-disable-line
   let [statusId] = useState([]); // eslint-disable-line
   const [level] = useState([]); // eslint-disable-line
-  const [statusRequest, storeStatusRequest] = useState(0);
+  const [statusRequest, storeStatusRequest] = useState(1);
   const [modalAddNewShow, setAddNewModalShow] = useState(false);
   const [modalEditShow, setEditModalShow] = useState(false);
-  const [key, setKey] = useState("save_draft");
+  const [key, setKey] = useState("request");
   const [successModal, setsuccessModal] = useState(false);
   const [access_token] = useState(
     "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiI5MGRmMjQ1YS1hNjFlLTQ2M2QtOGFkNC02OWE5ZGJjODkzNTIiLCJqdGkiOiJhOGJiOTYwNjYyN2I1M2RmMWU2OGUyYjdhMGY5NmNiMzEzOGMxODY5ZjI1MzdhODlhNjYxZWVhOGMzMDRlNDZjMDRmMDBhMGRmNDJlMWRjZSIsImlhdCI6MTYyMjE3NjExOSwibmJmIjoxNjIyMTc2MTE5LCJleHAiOjE2NTM3MTIxMTksInN1YiI6IjUxNiIsInNjb3BlcyI6W119.U0X7o1hnzBGs38DdE55_ant_pvrrKmv5IjBvJmMyRYPG4LEOR6C_UtbmYzPPcSmXODrrZHvndo3_PaR7KJ-o8ZwYe2KlV5VTtW7hhuEHJvHfkG0k6y7AUocRKDoQI65v5-_0XABVhCejR4RhYCd5Hl-zORcx29w97w3Ry7ThOoHDmm286YiCgDB3pkhkuXNlT_P3x7BPqVwP80yK8TdcnSqL6wPwtSJLPNvX34m7e5GYVgk9X1Y0HG-gzAer7h-eqBMnEJJkphmV3W-eSwyra8S5gFD_czO3xVbgBxoYJNiVqRM2ubDyzj6ykmhA0_H0lLS2WGGZZEnpSGafA70ELXNU3hXoefxqLaupR2juBNrW2HLx4Y6lGC9SNHmll-G4DxkPmGrNFrdzN2noOe8jYlX3fUu9hKeHe8G4Q2cybvJajrfKcpEjvch0Iw3WdB9E5Lv6CZqlVdWHHThHEXPgWDzL5mydgb7TVQz4gQGpwsm4Y57w4s-3FclLxJdaOZnyJTAV_FA2GVWPPDZkYfd_dY8FMehpa_YuN2iQCy-JxpyaANMJorTUS_pnD0Mv65ZWRNZEHTZMGZs9-hfRkIs5ElcTwN7vDVd1WKiuicvhw_ab7aCM_MvxDO2lwWRY-ybPn2TRyZYIMP7S2-ZT7uBoIrS3qNoxsWMSTjzxMDonVyk"
   );
-
-  useEffect(() => {
-    getStatusId();
-  }, []);
 
   useEffect(() => {
     props.GetListAllStore.storeAccessToken(access_token);
@@ -104,6 +99,7 @@ const RenderTabs = observer((props) => {
         props.GetListAllStore.storeLevel(level);
       })
       .catch(function (error) {
+        console.log(error);
         window.location.href = "https://e-work.rihes.cmu.ac.th/";
       })
       .then(function () {});
@@ -134,30 +130,6 @@ const RenderTabs = observer((props) => {
       });
   };
 
-  const getStatusId = () => {
-    axios
-      .get("/api/translate/v1/status_user", {
-        headers: {
-          Authorization: "Bearer " + access_token,
-        },
-      })
-      .then(function (response) {
-        if (response.status === 200) {
-          const data = response.data; 
-          console.log(response);
-          setDataStatus(data);
-        }
-      })
-      .catch(function (error) {
-        console.log(error);
-        window.location.href = "https://e-work.rihes.cmu.ac.th/";
-        // alert(error);
-      })
-      .then(function () {
-        // always executed
-      });
-  };
-
   const handleCloseSuccess = () => {
     setTimeout(function () {
       setsuccessModal(false);
@@ -175,8 +147,8 @@ const RenderTabs = observer((props) => {
   };
 
   const handleRowClick = (e) => {
+    debugger;
     var m = moment(e.doneAt, "DD MMMM YYYY", "th");
-
     if (props.GetListAllStore.onClick) {
       props.GetListAllStore.storeData(
         e.name,
@@ -190,7 +162,8 @@ const RenderTabs = observer((props) => {
         e.note,
         e.createdAt,
         e.id,
-        e.attachments
+        e.attachments,
+        e.translator
       );
       setEditModalShow(true);
     }
@@ -198,11 +171,6 @@ const RenderTabs = observer((props) => {
 
   const setEvent = (k) => {
     switch (k) {
-      case "save_draft":
-        setKey(k);
-        getListAll(0);
-        storeStatusRequest(0);
-        break;
       case "request":
         setKey(k);
         getListAll(1);
@@ -212,16 +180,6 @@ const RenderTabs = observer((props) => {
         setKey(k);
         getListAll(2);
         storeStatusRequest(2);
-        break;
-      case "accept":
-        setKey(k);
-        getListAll(3);
-        storeStatusRequest(3);
-        break;
-      case "complete":
-        setKey(k);
-        getListAll(4);
-        storeStatusRequest(4);
         break;
       case "reject":
         setKey(k);
@@ -240,36 +198,15 @@ const RenderTabs = observer((props) => {
         activeKey={key}
         onSelect={(k) => setEvent(k)}
       >
-        {statusId.includes(0) && (
-          <Tab eventKey="save_draft" title="บันทึกฉบับร่าง">
-            {Tables()}
-          </Tab>
-        )}
-        {statusId.includes(1) && (
-          <Tab eventKey="request" title="ส่ง">
-            {Tables()}
-          </Tab>
-        )}
-        {statusId.includes(2) && (
-          <Tab eventKey="approved" title="อนุมัติ">
-            {Tables()}
-          </Tab>
-        )}
-        {statusId.includes(3) && (
-          <Tab eventKey="accept" title="รับงานแล้ว">
-            {Tables()}
-          </Tab>
-        )}
-        {statusId.includes(4) && (
-          <Tab eventKey="complete" title="ส่งงานแล้ว">
-            {Tables()}
-          </Tab>
-        )}
-        {statusId.includes(5) && (
-          <Tab eventKey="reject" title="ปฏิเสธ">
-            {Tables()}
-          </Tab>
-        )}
+        <Tab eventKey="request" title="ส่งงาน">
+          {Tables()}
+        </Tab>
+        <Tab eventKey="approved" title="อนุมัติ">
+          {Tables()}
+        </Tab>
+        <Tab eventKey="reject" title="ปฏิเสธ">
+          {Tables()}
+        </Tab>
       </Tabs>
     );
   };
@@ -286,13 +223,17 @@ const RenderTabs = observer((props) => {
       id: dataRes[i].id,
       useInProject: dataRes[i].project_name,
       projName: dataRes[i].name,
-      price: "-",
+      price: [<div className="rowTable">{"-"} </div>],
       doneAt: moment(new Date(dataRes[i].done_at)).format("LL"),
-      acknowledgeHead: "-",
-      acknowledgeStaff: "-",
-      status: dataRes[i].status_id.map(({ name }) => name),
+      acknowledgeHead: [<div className="rowTable">{"-"}</div>],
+      acknowledgeStaff: [<div className="rowTable">{"-"}</div>],
+      status: [
+        <div className="rowTable">
+          {dataRes[i].status_id.map(({ name }) => name)}
+        </div>,
+      ],
       editFollowUp: [
-        <div style={{ pointerEvents: "auto" }}>
+        <div className="rowTable">
           <Button
             variant="info"
             size="sm"
@@ -313,6 +254,16 @@ const RenderTabs = observer((props) => {
       name: dataRes[i].emp_name,
       empDep: dataRes[i].emp_dep,
       attachments: dataRes[i].attachments,
+      translator: dataRes[i].translator.map(({ name }) => name),
+      headName: [
+        <div className="rowTableHead">
+          <p>{dataRes[i].head_name ? dataRes[i].head_name : '-'}</p>
+          <p className="subRow" style={{ fontSize: 12 }}>
+            {dataRes[i].head_updated_at ? moment(dataRes[i].head_updated_at).format("LLL") + " น." : ''}
+          </p>
+        </div>,
+      ],
+      // headUpdated: dataRes[i].head_updated_at
     });
   }
 
@@ -320,71 +271,128 @@ const RenderTabs = observer((props) => {
     return (
       <div className="titleTable">
         <b>{lb}</b>
-        <i key="Lorem" className="fa fa-sort ml-2" aria-hidden="true"></i>
+        {/* <i key="Lorem" className="fa fa-sort ml-2" aria-hidden="true"></i> */}
       </div>
     );
   };
 
   const Tables = () => {
-    const data = {
-      columns: [
-        {
-          label: [labelHead("ชื่อเอกสาร")],
-          field: "projName",
-          sort: "asc",
-          width: 150,
-        },
-        {
-          label: [labelHead("ใช้ในงาน / โครงการ")],
-          field: "useInProject",
-          sort: "asc",
-          width: 500,
-        },
-        {
-          label: [labelHead("ค่าใช้จ่าย")],
-          field: "price",
-          sort: "asc",
-          width: 200,
-        },
-        {
-          label: [labelHead("วันที่ต้องรับเอกสาร")],
-          field: "doneAt",
-          sort: "asc",
-          width: 100,
-        },
-        {
-          label: [labelHead("หัวหน้ารับทราบ")],
-          field: "acknowledgeHead",
-          sort: "asc",
-          width: 150,
-        },
-        {
-          label: [labelHead("เจ้าหน้าที่รับทราบ")],
-          field: "acknowledgeStaff",
-          sort: "asc",
-          width: 100,
-        },
-        {
-          label: [labelHead("สถานะ")],
-          field: "status",
-          sort: "asc",
-          width: 100,
-        },
-        {
-          label: [labelHead("แก้ไข / ติดตาม")],
-          field: "editFollowUp",
-          sort: "asc",
-          width: 150,
-        },
-        {
-          label: [labelHead("วันที่บันทึก")],
-          field: "createdAt",
-          sort: "asc",
-          width: 100,
-        },
-      ],
-      rows,
-    };
+    let data;
+    if (statusRequest === 2) {
+      data = {
+        columns: [
+          {
+            label: [labelHead("ชื่อเอกสาร")],
+            field: "projName",
+            sort: "asc",
+            width: 150,
+          },
+          {
+            label: [labelHead("ใช้ในงาน / โครงการ")],
+            field: "useInProject",
+            sort: "asc",
+            width: 150,
+          },
+          {
+            label: [labelHead("ค่าใช้จ่าย")],
+            field: "price",
+            sort: "asc",
+            width: 150,
+          },
+          {
+            label: [labelHead("วันที่ต้องรับเอกสาร")],
+            field: "doneAt",
+            sort: "asc",
+            width: 150,
+          },
+          {
+            label: [labelHead("หัวหน้ารับทราบ")],
+            field: "headName",
+            sort: "asc",
+            width: 150,
+          },
+          {
+            label: [labelHead("เจ้าหน้าที่รับทราบ")],
+            field: "acknowledgeStaff",
+            sort: "asc",
+            width: 150,
+          },
+          {
+            label: [labelHead("สถานะ")],
+            field: "status",
+            sort: "asc",
+            width: 150,
+          },
+          {
+            label: [labelHead("วันที่บันทึก")],
+            field: "createdAt",
+            sort: "asc",
+            width: 100,
+          },
+        ],
+        rows,
+      };
+    } else {
+      data = {
+        columns: [
+          {
+            label: [labelHead("ชื่อเอกสาร")],
+            field: "projName",
+            sort: "asc",
+            width: 150,
+          },
+          {
+            label: [labelHead("ใช้ในงาน / โครงการ")],
+            field: "useInProject",
+            sort: "asc",
+            width: 150,
+          },
+          {
+            label: [labelHead("ค่าใช้จ่าย")],
+            field: "price",
+            sort: "asc",
+            width: 150,
+          },
+          {
+            label: [labelHead("วันที่ต้องรับเอกสาร")],
+            field: "doneAt",
+            sort: "asc",
+            width: 150,
+          },
+          {
+            label: [labelHead("หัวหน้ารับทราบ")],
+            field: "acknowledgeHead",
+            sort: "asc",
+            width: 150,
+          },
+          {
+            label: [labelHead("เจ้าหน้าที่รับทราบ")],
+            field: "acknowledgeStaff",
+            sort: "asc",
+            width: 150,
+          },
+          {
+            label: [labelHead("สถานะ")],
+            field: "status",
+            sort: "asc",
+            width: 150,
+          },
+          {
+            label: [labelHead("แก้ไข / ติดตาม")],
+            field: "editFollowUp",
+            sort: "asc",
+            width: 150,
+          },
+          {
+            label: [labelHead("วันที่บันทึก")],
+            field: "createdAt",
+            sort: "asc",
+            width: 100,
+          },
+        ],
+        rows,
+      };
+    }
 
     return (
       <MDBDataTable
@@ -398,6 +406,7 @@ const RenderTabs = observer((props) => {
         infoLabel={["แสดงรายการค้นหา", "ถึง", "จาก ทั้งหมด", "รายการ"]}
         displayEntries={false}
         noBottomColumns
+        entries={20}
       />
     );
   };
@@ -405,11 +414,6 @@ const RenderTabs = observer((props) => {
   return (
     <div class="m-3">
       <div class="m-3">
-        <div style={{ marginBottom: 16 }}>
-          <Button variant="success" onClick={() => setAddNewModalShow(true)}>
-            <i class="fa fa-plus mr-2"></i> <b>เพิ่มแบบฟอร์ม</b>
-          </Button>
-        </div>
         <AddNewModal
           show={modalAddNewShow}
           onHide={() => setAddNewModalShow(false)}

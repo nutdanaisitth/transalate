@@ -18,6 +18,7 @@ class GetListAllStore {
   successTitle = "";
   access_token = "";
   level = [];
+  translator = ""
 
   onClick = false;
   storeData = (
@@ -32,7 +33,8 @@ class GetListAllStore {
     note,
     createdAt,
     id,
-    attachments
+    attachments,
+    translator
   ) => {
     this.name = name;
     this.empDep = empDep;
@@ -46,6 +48,7 @@ class GetListAllStore {
     this.createdAt = createdAt;
     this.id = id;
     this.attachments = attachments;
+    this.translator = translator
   };
   storeOnClick = (onClick) => {
     this.onClick = onClick;

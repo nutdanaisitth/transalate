@@ -480,6 +480,7 @@ const Edit = observer((props) => {
                       )
                     )
                   }
+                  disabled
                 >
                   {projName.map((projName) => (
                     <option key={projName.id} value={projName.name}>
@@ -506,6 +507,7 @@ const Edit = observer((props) => {
                   type="text"
                   class="form-control"
                   required
+                  disabled
                 />
                 <Form.Control.Feedback type="invalid">
                   ห้ามว่าง.
@@ -537,6 +539,7 @@ const Edit = observer((props) => {
                       }
                     }}
                     style={{ marginRight: 8 }}
+                    disabled
                   />
                   ภาษาไทยเป็นภาษาอังกฤษ โดยมีต้นฉบับภาษาไทย{" "}
                   <span class="ml-5">จำนวน</span>{" "}
@@ -572,6 +575,7 @@ const Edit = observer((props) => {
                       }
                     }}
                     style={{ marginRight: 8 }}
+                    disabled
                   />
                   ภาษาอังกฤษเป็นภาษาไทย โดยมีต้นฉบับภาษาอังกฤษ{" "}
                   <span class="ml-4">จำนวน</span>{" "}
@@ -615,6 +619,7 @@ const Edit = observer((props) => {
                       }
                     }}
                     style={{ marginRight: 8 }}
+                    disabled
                   />
                   โดยมีต้นฉบับภาษาอังกฤษ <span class="ml-5">จำนวน</span>{" "}
                   <input
@@ -634,7 +639,7 @@ const Edit = observer((props) => {
               </div>
             </div>
 
-            <div class="form-group row mt-4">
+            {/* <div class="form-group row mt-4">
               <label for="txtNote" class="col-sm-2 control-label">
                 เลือกไฟล์แนบ:
                 <small>(เอกสารที่ต้องการแปล)</small>{" "}
@@ -649,6 +654,7 @@ const Edit = observer((props) => {
                     class="form-control-file"
                     onChange={(e) => handleFile(e)}
                     style={{ width: 300 }}
+                    disabled
                   />
                 </div>
 
@@ -660,11 +666,12 @@ const Edit = observer((props) => {
                     () => printBtn()
                     // addChooseFile({name:'t',namee:'t'})
                   }
+                  disabled
                 >
                   เพิ่มไฟล์อีก
                 </button>
               </div>
-            </div>
+            </div> */}
 
             <div class="form-group row mt-4">
               <label for="txtNote" class="col-sm-2 control-label">
@@ -692,6 +699,7 @@ const Edit = observer((props) => {
                   data-mask="99/99/9999"
                   style={{ width: 200 }}
                   required
+                  disabled
                 />
               </div>
             </div>
@@ -707,6 +715,7 @@ const Edit = observer((props) => {
                   cols="30"
                   rows="2"
                   class="form-control"
+                  disabled
                 ></textarea>
               </div>
             </div>
@@ -715,19 +724,11 @@ const Edit = observer((props) => {
               <label class="col-sm-2 control-label"></label>
               <div class="col-sm-10">
                 <p class="m-t bg-muted p-sm">
-                  ผู้แปล คุณพจนารถ เอมศิรานันท์ โดยได้ส่งเอกสารมายัง
-                  j_jea@rihes.org CC: ariya@rihes.org และ venus@rihes.org{" "}
+                 {'ผู้แปล: '+ (props.GetListAllStore.translator ? props.GetListAllStore.translator : '-') + ' โดยได้ส่งเอกสารมายัง  j_jea@rihes.org CC: ariya@rihes.org และ venus@rihes.org'}
                 </p>
               </div>
             </div>
-            <div class="mail-body text-right tooltip-demo mb-3">
-              {/* <Button
-                variant="secondary"
-                onClick={() => handleClose()}
-                style={{ marginRight: 16 }}
-              >
-                ปิด
-              </Button> */}
+            {/* <div class="mail-body text-right tooltip-demo mb-3">
               <Button
                 id="submitformSave"
                 type="submit"
@@ -736,6 +737,7 @@ const Edit = observer((props) => {
                 data-placement="top"
                 title="บันทึก"
                 onClick={(e) => handleSubmit(e)}
+                disabled
               >
                 <i class="fa fa-save mr-2"></i>บันทึก
               </Button>
@@ -760,7 +762,7 @@ const Edit = observer((props) => {
               >
                 <i class="fa fa-trash mr-2"></i>ลบ
               </Button>
-            </div>
+            </div> */}
             <div class="clearfix"></div>
           </div>
         </div>
