@@ -19,6 +19,8 @@ class GetListAllStore {
   access_token = "";
   level = [];
   translator = ""
+  statusRequest = 0
+  translator_attachments = []
 
   onClick = false;
   storeData = (
@@ -34,7 +36,8 @@ class GetListAllStore {
     createdAt,
     id,
     attachments,
-    translator
+    translator,
+    translator_attachments
   ) => {
     this.name = name;
     this.empDep = empDep;
@@ -49,6 +52,7 @@ class GetListAllStore {
     this.id = id;
     this.attachments = attachments;
     this.translator = translator
+    this.translator_attachments = translator_attachments
   };
   storeOnClick = (onClick) => {
     this.onClick = onClick;
@@ -72,6 +76,10 @@ class GetListAllStore {
   storeLevel = (level) => {
     this.level = level;
   };
+
+  storeStatusRequest = (status_request) => {
+    this.statusRequest = status_request;
+  };
 }
 decorate(GetListAllStore, {
   test: observable,
@@ -81,6 +89,7 @@ decorate(GetListAllStore, {
   storeSuccessTitle: action,
   storeAccessToken: action,
   storeLevel: action,
+  storeStatusRequest: action
 });
 
 export default new GetListAllStore();

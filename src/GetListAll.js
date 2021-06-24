@@ -62,10 +62,10 @@ const RenderTabs = observer((props) => {
   const [dataStatus, setDataStatus] = useState([]); // eslint-disable-line
   let [statusId] = useState([]); // eslint-disable-line
   const [level] = useState([]); // eslint-disable-line
-  const [statusRequest, storeStatusRequest] = useState(1);
+  const [statusRequest, storeStatusRequest] = useState(2);
   const [modalAddNewShow, setAddNewModalShow] = useState(false);
   const [modalEditShow, setEditModalShow] = useState(false);
-  const [key, setKey] = useState("request");
+  const [key, setKey] = useState("approved");
   const [successModal, setsuccessModal] = useState(false);
   const [access_token] = useState(
     "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiI5MGRmMjQ1YS1hNjFlLTQ2M2QtOGFkNC02OWE5ZGJjODkzNTIiLCJqdGkiOiJhOGJiOTYwNjYyN2I1M2RmMWU2OGUyYjdhMGY5NmNiMzEzOGMxODY5ZjI1MzdhODlhNjYxZWVhOGMzMDRlNDZjMDRmMDBhMGRmNDJlMWRjZSIsImlhdCI6MTYyMjE3NjExOSwibmJmIjoxNjIyMTc2MTE5LCJleHAiOjE2NTM3MTIxMTksInN1YiI6IjUxNiIsInNjb3BlcyI6W119.U0X7o1hnzBGs38DdE55_ant_pvrrKmv5IjBvJmMyRYPG4LEOR6C_UtbmYzPPcSmXODrrZHvndo3_PaR7KJ-o8ZwYe2KlV5VTtW7hhuEHJvHfkG0k6y7AUocRKDoQI65v5-_0XABVhCejR4RhYCd5Hl-zORcx29w97w3Ry7ThOoHDmm286YiCgDB3pkhkuXNlT_P3x7BPqVwP80yK8TdcnSqL6wPwtSJLPNvX34m7e5GYVgk9X1Y0HG-gzAer7h-eqBMnEJJkphmV3W-eSwyra8S5gFD_czO3xVbgBxoYJNiVqRM2ubDyzj6ykmhA0_H0lLS2WGGZZEnpSGafA70ELXNU3hXoefxqLaupR2juBNrW2HLx4Y6lGC9SNHmll-G4DxkPmGrNFrdzN2noOe8jYlX3fUu9hKeHe8G4Q2cybvJajrfKcpEjvch0Iw3WdB9E5Lv6CZqlVdWHHThHEXPgWDzL5mydgb7TVQz4gQGpwsm4Y57w4s-3FclLxJdaOZnyJTAV_FA2GVWPPDZkYfd_dY8FMehpa_YuN2iQCy-JxpyaANMJorTUS_pnD0Mv65ZWRNZEHTZMGZs9-hfRkIs5ElcTwN7vDVd1WKiuicvhw_ab7aCM_MvxDO2lwWRY-ybPn2TRyZYIMP7S2-ZT7uBoIrS3qNoxsWMSTjzxMDonVyk"
@@ -147,7 +147,6 @@ const RenderTabs = observer((props) => {
   };
 
   const handleRowClick = (e) => {
-    debugger;
     var m = moment(e.doneAt, "DD MMMM YYYY", "th");
     if (props.GetListAllStore.onClick) {
       props.GetListAllStore.storeData(
@@ -163,7 +162,8 @@ const RenderTabs = observer((props) => {
         e.createdAt,
         e.id,
         e.attachments,
-        e.translator
+        e.translator,
+        e.translator_attachments
       );
       setEditModalShow(true);
     }
@@ -171,20 +171,29 @@ const RenderTabs = observer((props) => {
 
   const setEvent = (k) => {
     switch (k) {
-      case "request":
-        setKey(k);
-        getListAll(1);
-        storeStatusRequest(1);
-        break;
       case "approved":
         setKey(k);
         getListAll(2);
         storeStatusRequest(2);
+        props.GetListAllStore.storeStatusRequest(2);
+        break;
+      case "accept":
+        setKey(k);
+        getListAll(3);
+        storeStatusRequest(3);
+        props.GetListAllStore.storeStatusRequest(3);
+        break;
+      case "complete":
+        setKey(k);
+        getListAll(4);
+        storeStatusRequest(4);
+        props.GetListAllStore.storeStatusRequest(4);
         break;
       case "reject":
         setKey(k);
         getListAll(5);
         storeStatusRequest(5);
+        props.GetListAllStore.storeStatusRequest(5);
         break;
       default:
         break;
@@ -198,10 +207,13 @@ const RenderTabs = observer((props) => {
         activeKey={key}
         onSelect={(k) => setEvent(k)}
       >
-        <Tab eventKey="request" title="ส่งงาน">
+        <Tab eventKey="approved" title="อนุมัติ">
           {Tables()}
         </Tab>
-        <Tab eventKey="approved" title="อนุมัติ">
+        <Tab eventKey="accept" title="รับงาน">
+          {Tables()}
+        </Tab>
+        <Tab eventKey="complete" title="ส่งงานแปล">
           {Tables()}
         </Tab>
         <Tab eventKey="reject" title="ปฏิเสธ">
@@ -254,13 +266,49 @@ const RenderTabs = observer((props) => {
       name: dataRes[i].emp_name,
       empDep: dataRes[i].emp_dep,
       attachments: dataRes[i].attachments,
+      translator_attachments: dataRes[i].translator_attachments,
       translator: dataRes[i].translator.map(({ name }) => name),
       headName: [
         <div className="rowTableHead">
-          <p>{dataRes[i].head_name ? dataRes[i].head_name : '-'}</p>
+          <p>{dataRes[i].head_name ? dataRes[i].head_name : "-"}</p>
           <p className="subRow" style={{ fontSize: 12 }}>
-            {dataRes[i].head_updated_at ? moment(dataRes[i].head_updated_at).format("LLL") + " น." : ''}
+            {dataRes[i].head_updated_at
+              ? moment(dataRes[i].head_updated_at).format("LL")
+              : ""}
           </p>
+          <p className="subRow" style={{ fontSize: 12 }}>
+            {dataRes[i].head_updated_at
+              ? "เวลา: " +
+                moment(dataRes[i].head_updated_at).format("LT") +
+                " น."
+              : ""}
+          </p>
+        </div>,
+      ],
+      translatorName: [
+        <div className="rowTableTranslator">
+          {statusRequest !== 2 && (
+            <p>
+              {dataRes[i].translator_name ? dataRes[i].translator_name : "-"}
+            </p>
+          )}
+          {statusRequest !== 2 && (
+            <p className="subRow" style={{ fontSize: 12 }}>
+              {dataRes[i].translator_updated_at
+                ? moment(dataRes[i].translator_updated_at).format("LL")
+                : ""}
+            </p>
+          )}
+          {statusRequest !== 2 && (
+            <p className="subRow" style={{ fontSize: 12 }}>
+              {dataRes[i].head_updated_at
+                ? "เวลา: " +
+                  moment(dataRes[i].translator_updated_at).format("LT") +
+                  " น."
+                : ""}
+            </p>
+          )}
+          {statusRequest === 2 && <p>-</p>}
         </div>,
       ],
       // headUpdated: dataRes[i].head_updated_at
@@ -278,7 +326,7 @@ const RenderTabs = observer((props) => {
 
   const Tables = () => {
     let data;
-    if (statusRequest === 2) {
+    if (statusRequest !== 5) {
       data = {
         columns: [
           {
@@ -313,13 +361,19 @@ const RenderTabs = observer((props) => {
           },
           {
             label: [labelHead("เจ้าหน้าที่รับทราบ")],
-            field: "acknowledgeStaff",
+            field: "translatorName",
             sort: "asc",
             width: 150,
           },
           {
             label: [labelHead("สถานะ")],
             field: "status",
+            sort: "asc",
+            width: 150,
+          },
+          {
+            label: [labelHead("แก้ไข / ติดตาม")],
+            field: "editFollowUp",
             sort: "asc",
             width: 150,
           },
@@ -361,25 +415,19 @@ const RenderTabs = observer((props) => {
           },
           {
             label: [labelHead("หัวหน้ารับทราบ")],
-            field: "acknowledgeHead",
+            field: "headName",
             sort: "asc",
             width: 150,
           },
           {
             label: [labelHead("เจ้าหน้าที่รับทราบ")],
-            field: "acknowledgeStaff",
+            field: "translatorName",
             sort: "asc",
             width: 150,
           },
           {
             label: [labelHead("สถานะ")],
             field: "status",
-            sort: "asc",
-            width: 150,
-          },
-          {
-            label: [labelHead("แก้ไข / ติดตาม")],
-            field: "editFollowUp",
             sort: "asc",
             width: 150,
           },

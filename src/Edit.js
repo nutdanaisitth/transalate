@@ -9,11 +9,14 @@ require("moment/locale/th.js");
 const Edit = observer((props) => {
   moment.locale("th");
   const [name, setName] = useState("");
+  const [submitFile, setSubmitFile] = useState(false);
   const [position, setPosition] = useState("");
   const [department, setDepartment] = useState("");
   const [access_token, storeAccessToken] = useState(
     localStorage.getItem("access_token")
   ); // eslint-disable-line
+
+  const [showFileTrans, setShowFile] = useState(true);
 
   let [chooseFile, addChooseFile] = useState([]);
 
@@ -22,15 +25,18 @@ const Edit = observer((props) => {
     props.GetListAllStore.fileName
   );
 
-  const [disTH, setdisTH] = useState(" ");
-  const [disEng, setdisEng] = useState(" ");
-  const [disComEng, setdisComEng] = useState(" ");
-  const [status_id, setStatusid] = useState("");
-  const [translatorStatus] = useState([
+  const other = [
     {
       id: 3,
       name: "รับงาน",
     },
+    {
+      id: 5,
+      name: "ปฏิเสธงาน",
+    },
+  ];
+
+  const accept = [
     {
       id: 4,
       name: "ส่งงาน",
@@ -39,8 +45,20 @@ const Edit = observer((props) => {
       id: 5,
       name: "ปฏิเสธงาน",
     },
-  ]);
-  const [selectedStatus, setSelectedStatus] = useState(translatorStatus[0]);
+  ];
+
+  const [disTH, setdisTH] = useState(" ");
+  const [disEng, setdisEng] = useState(" ");
+  const [disComEng, setdisComEng] = useState(" ");
+  const [status_id, setStatusid] = useState("");
+  const [translatorStatus] = useState(
+    props.GetListAllStore.statusRequest === 3 ? accept : other
+  );
+  const [selectedStatus, setSelectedStatus] = useState(
+    props.GetListAllStore.statusRequest === 3
+      ? translatorStatus[1]
+      : translatorStatus[0]
+  );
 
   const [checkTH, isCheckTH] = useState(
     props.GetListAllStore.thaiToEng ? true : false
@@ -52,8 +70,9 @@ const Edit = observer((props) => {
     props.GetListAllStore.composeEng ? true : false
   );
   const [validated, setValidated] = useState(false);
-  const [attachments, storeAttachments] = useState(
-    props.GetListAllStore.attachments
+  const [attachments] = useState(props.GetListAllStore.attachments);
+  const [translator_attachments] = useState(
+    props.GetListAllStore.translator_attachments
   );
 
   let refTHtoE = useRef();
@@ -84,11 +103,7 @@ const Edit = observer((props) => {
     axios
       .get("/api/v1/auth/user", {
         headers: {
-          Authorization:
-            "Bearer " +
-            // "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiI5MGRmMjQ1YS1hNjFlLTQ2M2QtOGFkNC02OWE5ZGJjODkzNTIiLCJqdGkiOiJhOGJiOTYwNjYyN2I1M2RmMWU2OGUyYjdhMGY5NmNiMzEzOGMxODY5ZjI1MzdhODlhNjYxZWVhOGMzMDRlNDZjMDRmMDBhMGRmNDJlMWRjZSIsImlhdCI6MTYyMjE3NjExOSwibmJmIjoxNjIyMTc2MTE5LCJleHAiOjE2NTM3MTIxMTksInN1YiI6IjUxNiIsInNjb3BlcyI6W119.U0X7o1hnzBGs38DdE55_ant_pvrrKmv5IjBvJmMyRYPG4LEOR6C_UtbmYzPPcSmXODrrZHvndo3_PaR7KJ-o8ZwYe2KlV5VTtW7hhuEHJvHfkG0k6y7AUocRKDoQI65v5-_0XABVhCejR4RhYCd5Hl-zORcx29w97w3Ry7ThOoHDmm286YiCgDB3pkhkuXNlT_P3x7BPqVwP80yK8TdcnSqL6wPwtSJLPNvX34m7e5GYVgk9X1Y0HG-gzAer7h-eqBMnEJJkphmV3W-eSwyra8S5gFD_czO3xVbgBxoYJNiVqRM2ubDyzj6ykmhA0_H0lLS2WGGZZEnpSGafA70ELXNU3hXoefxqLaupR2juBNrW2HLx4Y6lGC9SNHmll-G4DxkPmGrNFrdzN2noOe8jYlX3fUu9hKeHe8G4Q2cybvJajrfKcpEjvch0Iw3WdB9E5Lv6CZqlVdWHHThHEXPgWDzL5mydgb7TVQz4gQGpwsm4Y57w4s-3FclLxJdaOZnyJTAV_FA2GVWPPDZkYfd_dY8FMehpa_YuN2iQCy-JxpyaANMJorTUS_pnD0Mv65ZWRNZEHTZMGZs9-hfRkIs5ElcTwN7vDVd1WKiuicvhw_ab7aCM_MvxDO2lwWRY-ybPn2TRyZYIMP7S2-ZT7uBoIrS3qNoxsWMSTjzxMDonVyk",
-            // access_token,
-            props.GetListAllStore.access_token,
+          Authorization: "Bearer " + props.GetListAllStore.access_token,
         },
       })
       .then(function (response) {
@@ -106,33 +121,71 @@ const Edit = observer((props) => {
       });
   };
 
-  const requestUpdateStatus = async (event) => {
+  const requestUpdateStatus = (event) => {
     event.preventDefault();
     let formData = new FormData();
     let i = refTranslatorStatus.current.selectedIndex;
     let label = refTranslatorStatus.current[i].label;
-    if (event.target.id === "submitTranslatorSave") {
-      formData.append("status_id", refTranslatorStatus.current.value);
-      props.GetListAllStore.storeSuccessTitle(label);
-    }
     if (event.target.id === "submitHeadApprove") {
-      formData.append("status_id", 2);
       props.GetListAllStore.storeSuccessTitle("อนุญาตงาน");
-    }
-    if (event.target.id === "submitHeadReject") {
+      formData.append("status_id", 2);
+      formData.append("id", props.GetListAllStore.id);
+      requestUpdateOnlyStatus(formData);
+    } else if (event.target.id === "submitHeadReject") {
       formData.append("status_id", 5);
       props.GetListAllStore.storeSuccessTitle("ปฏิเสธงาน");
+      formData.append("id", props.GetListAllStore.id);
+      requestUpdateOnlyStatus(formData);
+    } else {
+      let attachment = chooseFile;
+      props.GetListAllStore.storeSuccessTitle(label);
+      for (var j = 0; j < attachment.length; j++) {
+        let file = attachment[j];
+        formData.append("attachment[" + j + "]", file);
+      }
+      if (attachment.length !== 0) {
+        formData.append("status_id", refTranslatorStatus.current.value);
+        requestUpdateStatusAndFile(formData);
+        setSubmitFile(false);
+      } else {
+        formData.append("status_id", refTranslatorStatus.current.value);
+        formData.append("id", props.GetListAllStore.id);
+        requestUpdateOnlyStatus(formData);
+        setSubmitFile(false);
+      }
     }
-    formData.append("id", props.GetListAllStore.id);
-    await axios
+  };
+
+  const requestUpdateStatusAndFile = (formData) => {
+    axios
+      .post(
+        "/api/translate/v1/translator/" + props.GetListAllStore.id,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: "Bearer " + props.GetListAllStore.access_token,
+          },
+        }
+      )
+      .then(function (response) {
+        if (response.status === 200) {
+          console.log(response);
+          handleClose();
+        }
+      })
+      .catch(function (error) {
+        console.log("Error", error);
+        alert(error);
+      });
+  };
+
+  const requestUpdateOnlyStatus = (formData) => {
+    axios
       .post("/api/translate/v1/status", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
-          Authorization:
-            "Bearer " +
-            // "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiI5MGRmMjQ1YS1hNjFlLTQ2M2QtOGFkNC02OWE5ZGJjODkzNTIiLCJqdGkiOiJhOGJiOTYwNjYyN2I1M2RmMWU2OGUyYjdhMGY5NmNiMzEzOGMxODY5ZjI1MzdhODlhNjYxZWVhOGMzMDRlNDZjMDRmMDBhMGRmNDJlMWRjZSIsImlhdCI6MTYyMjE3NjExOSwibmJmIjoxNjIyMTc2MTE5LCJleHAiOjE2NTM3MTIxMTksInN1YiI6IjUxNiIsInNjb3BlcyI6W119.U0X7o1hnzBGs38DdE55_ant_pvrrKmv5IjBvJmMyRYPG4LEOR6C_UtbmYzPPcSmXODrrZHvndo3_PaR7KJ-o8ZwYe2KlV5VTtW7hhuEHJvHfkG0k6y7AUocRKDoQI65v5-_0XABVhCejR4RhYCd5Hl-zORcx29w97w3Ry7ThOoHDmm286YiCgDB3pkhkuXNlT_P3x7BPqVwP80yK8TdcnSqL6wPwtSJLPNvX34m7e5GYVgk9X1Y0HG-gzAer7h-eqBMnEJJkphmV3W-eSwyra8S5gFD_czO3xVbgBxoYJNiVqRM2ubDyzj6ykmhA0_H0lLS2WGGZZEnpSGafA70ELXNU3hXoefxqLaupR2juBNrW2HLx4Y6lGC9SNHmll-G4DxkPmGrNFrdzN2noOe8jYlX3fUu9hKeHe8G4Q2cybvJajrfKcpEjvch0Iw3WdB9E5Lv6CZqlVdWHHThHEXPgWDzL5mydgb7TVQz4gQGpwsm4Y57w4s-3FclLxJdaOZnyJTAV_FA2GVWPPDZkYfd_dY8FMehpa_YuN2iQCy-JxpyaANMJorTUS_pnD0Mv65ZWRNZEHTZMGZs9-hfRkIs5ElcTwN7vDVd1WKiuicvhw_ab7aCM_MvxDO2lwWRY-ybPn2TRyZYIMP7S2-ZT7uBoIrS3qNoxsWMSTjzxMDonVyk",
-            // access_token,
-            props.GetListAllStore.access_token,
+          Authorization: "Bearer " + props.GetListAllStore.access_token,
         },
       })
       .then(function (response) {
@@ -151,11 +204,7 @@ const Edit = observer((props) => {
     axios
       .get("/api/translate/v1/projects", {
         headers: {
-          Authorization:
-            "Bearer " +
-            // "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiI5MGRmMjQ1YS1hNjFlLTQ2M2QtOGFkNC02OWE5ZGJjODkzNTIiLCJqdGkiOiJhOGJiOTYwNjYyN2I1M2RmMWU2OGUyYjdhMGY5NmNiMzEzOGMxODY5ZjI1MzdhODlhNjYxZWVhOGMzMDRlNDZjMDRmMDBhMGRmNDJlMWRjZSIsImlhdCI6MTYyMjE3NjExOSwibmJmIjoxNjIyMTc2MTE5LCJleHAiOjE2NTM3MTIxMTksInN1YiI6IjUxNiIsInNjb3BlcyI6W119.U0X7o1hnzBGs38DdE55_ant_pvrrKmv5IjBvJmMyRYPG4LEOR6C_UtbmYzPPcSmXODrrZHvndo3_PaR7KJ-o8ZwYe2KlV5VTtW7hhuEHJvHfkG0k6y7AUocRKDoQI65v5-_0XABVhCejR4RhYCd5Hl-zORcx29w97w3Ry7ThOoHDmm286YiCgDB3pkhkuXNlT_P3x7BPqVwP80yK8TdcnSqL6wPwtSJLPNvX34m7e5GYVgk9X1Y0HG-gzAer7h-eqBMnEJJkphmV3W-eSwyra8S5gFD_czO3xVbgBxoYJNiVqRM2ubDyzj6ykmhA0_H0lLS2WGGZZEnpSGafA70ELXNU3hXoefxqLaupR2juBNrW2HLx4Y6lGC9SNHmll-G4DxkPmGrNFrdzN2noOe8jYlX3fUu9hKeHe8G4Q2cybvJajrfKcpEjvch0Iw3WdB9E5Lv6CZqlVdWHHThHEXPgWDzL5mydgb7TVQz4gQGpwsm4Y57w4s-3FclLxJdaOZnyJTAV_FA2GVWPPDZkYfd_dY8FMehpa_YuN2iQCy-JxpyaANMJorTUS_pnD0Mv65ZWRNZEHTZMGZs9-hfRkIs5ElcTwN7vDVd1WKiuicvhw_ab7aCM_MvxDO2lwWRY-ybPn2TRyZYIMP7S2-ZT7uBoIrS3qNoxsWMSTjzxMDonVyk",
-            // access_token,
-            props.GetListAllStore.access_token,
+          Authorization: "Bearer " + props.GetListAllStore.access_token,
         },
       })
       .then(function (response) {
@@ -185,7 +234,23 @@ const Edit = observer((props) => {
     }
   };
 
+  const showTranslatedFile = () => {
+    var i;
+    for (i = 0; i < translator_attachments.length; i++) {
+      const anchor = document.createElement("a");
+      const list = document.getElementById("linksList");
+      const li = document.createElement("li");
+      anchor.href =
+        "https://api.rihes.cmu.ac.th/upload/translate/" +
+        translator_attachments[i].name;
+      anchor.innerText = translator_attachments[i].name;
+      li.appendChild(anchor);
+      list.appendChild(li);
+    }
+  };
+
   useEffect(() => {
+    showTranslatedFile();
     showFile();
     getUser();
     getProject();
@@ -252,11 +317,7 @@ const Edit = observer((props) => {
         {
           headers: {
             "Content-Type": "multipart/form-data",
-            Authorization:
-              "Bearer " +
-              // "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiI5MGRmMjQ1YS1hNjFlLTQ2M2QtOGFkNC02OWE5ZGJjODkzNTIiLCJqdGkiOiJhOGJiOTYwNjYyN2I1M2RmMWU2OGUyYjdhMGY5NmNiMzEzOGMxODY5ZjI1MzdhODlhNjYxZWVhOGMzMDRlNDZjMDRmMDBhMGRmNDJlMWRjZSIsImlhdCI6MTYyMjE3NjExOSwibmJmIjoxNjIyMTc2MTE5LCJleHAiOjE2NTM3MTIxMTksInN1YiI6IjUxNiIsInNjb3BlcyI6W119.U0X7o1hnzBGs38DdE55_ant_pvrrKmv5IjBvJmMyRYPG4LEOR6C_UtbmYzPPcSmXODrrZHvndo3_PaR7KJ-o8ZwYe2KlV5VTtW7hhuEHJvHfkG0k6y7AUocRKDoQI65v5-_0XABVhCejR4RhYCd5Hl-zORcx29w97w3Ry7ThOoHDmm286YiCgDB3pkhkuXNlT_P3x7BPqVwP80yK8TdcnSqL6wPwtSJLPNvX34m7e5GYVgk9X1Y0HG-gzAer7h-eqBMnEJJkphmV3W-eSwyra8S5gFD_czO3xVbgBxoYJNiVqRM2ubDyzj6ykmhA0_H0lLS2WGGZZEnpSGafA70ELXNU3hXoefxqLaupR2juBNrW2HLx4Y6lGC9SNHmll-G4DxkPmGrNFrdzN2noOe8jYlX3fUu9hKeHe8G4Q2cybvJajrfKcpEjvch0Iw3WdB9E5Lv6CZqlVdWHHThHEXPgWDzL5mydgb7TVQz4gQGpwsm4Y57w4s-3FclLxJdaOZnyJTAV_FA2GVWPPDZkYfd_dY8FMehpa_YuN2iQCy-JxpyaANMJorTUS_pnD0Mv65ZWRNZEHTZMGZs9-hfRkIs5ElcTwN7vDVd1WKiuicvhw_ab7aCM_MvxDO2lwWRY-ybPn2TRyZYIMP7S2-ZT7uBoIrS3qNoxsWMSTjzxMDonVyk",
-              // access_token,
-              props.GetListAllStore.access_token,
+            Authorization: "Bearer " + props.GetListAllStore.access_token,
           },
         }
       )
@@ -279,11 +340,7 @@ const Edit = observer((props) => {
       .delete("/api/translate/v1/translate/" + props.GetListAllStore.id, {
         headers: {
           "Content-Type": "multipart/form-data",
-          Authorization:
-            "Bearer " +
-            // "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiI5MGRmMjQ1YS1hNjFlLTQ2M2QtOGFkNC02OWE5ZGJjODkzNTIiLCJqdGkiOiJhOGJiOTYwNjYyN2I1M2RmMWU2OGUyYjdhMGY5NmNiMzEzOGMxODY5ZjI1MzdhODlhNjYxZWVhOGMzMDRlNDZjMDRmMDBhMGRmNDJlMWRjZSIsImlhdCI6MTYyMjE3NjExOSwibmJmIjoxNjIyMTc2MTE5LCJleHAiOjE2NTM3MTIxMTksInN1YiI6IjUxNiIsInNjb3BlcyI6W119.U0X7o1hnzBGs38DdE55_ant_pvrrKmv5IjBvJmMyRYPG4LEOR6C_UtbmYzPPcSmXODrrZHvndo3_PaR7KJ-o8ZwYe2KlV5VTtW7hhuEHJvHfkG0k6y7AUocRKDoQI65v5-_0XABVhCejR4RhYCd5Hl-zORcx29w97w3Ry7ThOoHDmm286YiCgDB3pkhkuXNlT_P3x7BPqVwP80yK8TdcnSqL6wPwtSJLPNvX34m7e5GYVgk9X1Y0HG-gzAer7h-eqBMnEJJkphmV3W-eSwyra8S5gFD_czO3xVbgBxoYJNiVqRM2ubDyzj6ykmhA0_H0lLS2WGGZZEnpSGafA70ELXNU3hXoefxqLaupR2juBNrW2HLx4Y6lGC9SNHmll-G4DxkPmGrNFrdzN2noOe8jYlX3fUu9hKeHe8G4Q2cybvJajrfKcpEjvch0Iw3WdB9E5Lv6CZqlVdWHHThHEXPgWDzL5mydgb7TVQz4gQGpwsm4Y57w4s-3FclLxJdaOZnyJTAV_FA2GVWPPDZkYfd_dY8FMehpa_YuN2iQCy-JxpyaANMJorTUS_pnD0Mv65ZWRNZEHTZMGZs9-hfRkIs5ElcTwN7vDVd1WKiuicvhw_ab7aCM_MvxDO2lwWRY-ybPn2TRyZYIMP7S2-ZT7uBoIrS3qNoxsWMSTjzxMDonVyk",
-            // access_token,
-            props.GetListAllStore.access_token,
+          Authorization: "Bearer " + props.GetListAllStore.access_token,
         },
       })
       .then(function (response) {
@@ -302,6 +359,9 @@ const Edit = observer((props) => {
     if (event.target.id === "submitformSend") {
       setStatusid("1");
     }
+    if (event.target.id === "submitTranslatorSave") {
+      setSubmitFile(true);
+    }
     if (event.target.id === "submitformDelete") {
       deleteSubmit(event);
     }
@@ -317,9 +377,14 @@ const Edit = observer((props) => {
         setValidated(true);
         props.AddNewStore.storeIsFirst(props.AddNewStore.isFirst + 1);
         if (props.AddNewStore.isValidate && props.AddNewStore.isFirst === 2) {
-          requestSubmit(event);
-          props.AddNewStore.clearIsFirst();
-          return false;
+          if (submitFile) {
+            requestUpdateStatus(event);
+            props.AddNewStore.clearIsFirst();
+          } else {
+            requestSubmit(event);
+            props.AddNewStore.clearIsFirst();
+            return false;
+          }
         }
       }
     } catch (error) {
@@ -327,6 +392,17 @@ const Edit = observer((props) => {
     }
   };
 
+  const selectOnchange = (e) => {
+    setSelectedStatus(
+      translatorStatus.find(
+        (translatorStatus) => translatorStatus.id === e.target.value
+      )
+    );
+
+    if (e.target.value === "4") {
+      setShowFile(true);
+    } else setShowFile(false);
+  };
   return (
     <Form
       noValidate
@@ -639,50 +715,32 @@ const Edit = observer((props) => {
               </div>
             </div>
 
-            {/* <div class="form-group row mt-4">
-              <label for="txtNote" class="col-sm-2 control-label">
-                เลือกไฟล์แนบ:
-                <small>(เอกสารที่ต้องการแปล)</small>{" "}
-              </label>
-              <div class="col-sm-10">
-                <div id="showItemFile">
-                  {" "}
-                  <input
-                    ref={refFile}
-                    name="itemFile[]"
-                    type="file"
-                    class="form-control-file"
-                    onChange={(e) => handleFile(e)}
-                    style={{ width: 300 }}
-                    disabled
-                  />
+            {props.GetListAllStore.statusRequest !== 4 && (
+              <div class="form-group row mt-4">
+                <label for="txtNote" class="col-sm-2 control-label">
+                  ไฟล์ที่แนบมา:
+                  <small>(กดที่ชื่อไฟล์เพื่อดาวน์โหลด)</small>{" "}
+                </label>
+                <div class="col-sm-10" id="downloadFile">
+                  <div id="linksList"></div>
+                  {attachments.length === 0 && <hr></hr>}
                 </div>
-
-                <button
-                  id="itemFileAdd"
-                  type="button"
-                  class="btn btn-secondary btn-sm m-2"
-                  onClick={
-                    () => printBtn()
-                    // addChooseFile({name:'t',namee:'t'})
-                  }
-                  disabled
-                >
-                  เพิ่มไฟล์อีก
-                </button>
               </div>
-            </div> */}
+            )}
 
-            <div class="form-group row mt-4">
-              <label for="txtNote" class="col-sm-2 control-label">
-                ไฟล์ที่แนบมา:
-                <small>(กดที่ชื่อไฟล์เพื่อดาวน์โหลด)</small>{" "}
-              </label>
-              <div class="col-sm-10" id="downloadFile">
-                <div id="linksList"></div>
-                {attachments.length == 0 && <hr></hr>}
+            {props.GetListAllStore.statusRequest === 4 && (
+              <div class="form-group row mt-4">
+                <label for="txtNote" class="col-sm-2 control-label">
+                  ไฟล์ที่แนบมา
+                  <p>(ไฟล์ที่แปลเรียบร้อย):</p>
+                  {/* <small>(กดที่ชื่อไฟล์เพื่อดาวน์โหลด)</small>{" "} */}
+                </label>
+                <div class="col-sm-10" id="downloadFile">
+                  <div id="linksList"></div>
+                  {translator_attachments.length === 0 && <hr></hr>}
+                </div>
               </div>
-            </div>
+            )}
 
             <div class="form-group row mt-4">
               <label for="done_at" class="col-sm-2 control-label">
@@ -724,7 +782,11 @@ const Edit = observer((props) => {
               <label class="col-sm-2 control-label"></label>
               <div class="col-sm-10">
                 <p class="m-t bg-muted p-sm">
-                 {'ผู้แปล: '+ (props.GetListAllStore.translator ? props.GetListAllStore.translator : '-') + ' โดยได้ส่งเอกสารมายัง  j_jea@rihes.org CC: ariya@rihes.org และ venus@rihes.org'}
+                  {"ผู้แปล: " +
+                    (props.GetListAllStore.translator
+                      ? props.GetListAllStore.translator
+                      : "-") +
+                    " โดยได้ส่งเอกสารมายัง  j_jea@rihes.org CC: ariya@rihes.org และ venus@rihes.org"}
                 </p>
               </div>
             </div>
@@ -787,13 +849,9 @@ const Edit = observer((props) => {
                   ref={refTranslatorStatus}
                   class="custom-select"
                   value={selectedStatus}
-                  onChange={(e) =>
-                    setSelectedStatus(
-                      translatorStatus.find(
-                        (translatorStatus) =>
-                          translatorStatus.id === e.target.value
-                      )
-                    )
+                  onChange={(e) => selectOnchange(e)}
+                  disabled={
+                    props.GetListAllStore.statusRequest === 4 ? true : false
                   }
                 >
                   {translatorStatus.map((translatorStatus) => (
@@ -808,6 +866,43 @@ const Edit = observer((props) => {
                 <div class="invalid-feedback">ห้ามว่าง.</div>
               </div>
             </div>
+            {showFileTrans && props.GetListAllStore.statusRequest === 3 && (
+              <div class="form-group row mt-4">
+                <label for="txtNote" class="col-sm-2 control-label">
+                  เลือกไฟล์แนบ:
+                  <small>(เอกสารที่แปลเรียบร้อยแล้ว)</small>{" "}
+                </label>
+                <div class="col-sm-10">
+                  <div id="showItemFile">
+                    {" "}
+                    <input
+                      ref={refFile}
+                      name="itemFile[]"
+                      type="file"
+                      class="form-control-file"
+                      onChange={(e) => handleFile(e)}
+                      style={{ width: 300 }}
+                      required
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      ห้ามว่าง.
+                    </Form.Control.Feedback>
+                  </div>
+
+                  <button
+                    id="itemFileAdd"
+                    type="button"
+                    class="btn btn-secondary btn-sm m-2"
+                    onClick={
+                      () => printBtn()
+                      // addChooseFile({name:'t',namee:'t'})
+                    }
+                  >
+                    เพิ่มไฟล์อีก
+                  </button>
+                </div>
+              </div>
+            )}
 
             <div class="mail-body text-right tooltip-demo mb-3">
               <Button
@@ -818,9 +913,9 @@ const Edit = observer((props) => {
                 data-placement="top"
                 title="บันทึก"
                 disabled={
-                  props.GetListAllStore.level.includes("pm") ? false : true
+                  props.GetListAllStore.statusRequest === 4 ? true : false
                 }
-                onClick={(e) => requestUpdateStatus(e)}
+                onClick={(e) => handleSubmit(e)}
               >
                 <i class="fa fa-save mr-2"></i>บันทึก
               </Button>
@@ -849,7 +944,7 @@ const Edit = observer((props) => {
                 data-toggle="tooltip"
                 data-placement="top"
                 disabled={
-                  props.GetListAllStore.level.includes("head") ? false : true
+                  props.GetListAllStore.statusRequest === 4 ? true : false
                 }
                 onClick={(e) => requestUpdateStatus(e)}
               >
@@ -863,7 +958,7 @@ const Edit = observer((props) => {
                 data-toggle="tooltip"
                 data-placement="top"
                 disabled={
-                  props.GetListAllStore.level.includes("head") ? false : true
+                  props.GetListAllStore.statusRequest === 4 ? true : false
                 }
                 style={{ marginLeft: 16 }}
                 onClick={(e) => requestUpdateStatus(e)}
