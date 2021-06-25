@@ -834,7 +834,6 @@ const Edit = observer((props) => {
             <div class="mb-3">
               <h4>สำหรับหัวหน้า</h4>
             </div>
-
             <div
               class="mail-body text-center tooltip-demo mb-3"
               style={{ marginTop: 32 }}
