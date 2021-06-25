@@ -290,7 +290,11 @@ const RenderTabs = observer((props) => {
       doneAt: moment(new Date(dataRes[i].done_at)).format("LL"),
       acknowledgeHead: [<div className="rowTable">{"-"}</div>],
       acknowledgeStaff: [<div className="rowTable">{"-"}</div>],
-      status: [<div className="rowTable">{dataRes[i].status_id.map(({ name }) => name)}</div>],
+      status: [
+        <div className="rowTable">
+          {dataRes[i].status_id.map(({ name }) => name)}
+        </div>,
+      ],
       editFollowUp: [
         <div className="rowTable">
           <Button
