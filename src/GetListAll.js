@@ -324,7 +324,7 @@ const RenderTabs = observer((props) => {
     return (
       <div className="titleTable">
         <b>{lb}</b>
-        <i key="Lorem" className="fa fa-sort ml-2" aria-hidden="true"></i>
+        {/* <i key="Lorem" className="fa fa-sort ml-2" aria-hidden="true"></i> */}
       </div>
     );
   };
