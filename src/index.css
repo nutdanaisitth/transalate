@@ -85,3 +85,17 @@ th .caret-4-desc:after {
   align-content: center;
 }
 
+.rowNav {
+  width: 200px;
+}
+.badge {
+  margin-right: 8px;
+}
+.row {
+  flex-direction: row;
+  text-align: center;
+}
+.tab {
+  margin-left: 8px;
+  margin-right: 8px;
+}

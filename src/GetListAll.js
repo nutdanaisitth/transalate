@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Tabs, Tab, Modal, Button } from "react-bootstrap";
+import {
+  Tabs,
+  Tab,
+  Modal,
+  Button,
+  Badge,
+  Row,
+  Nav,
+  Col,
+} from "react-bootstrap";
 import { MDBDataTable } from "mdbreact";
 import AddNew from "./AddNew";
 import { observer, inject } from "mobx-react";
@@ -233,40 +242,54 @@ const RenderTabs = observer((props) => {
     }
   };
 
+  const badgeTab = (title) => {
+    return (
+      <div className="row">
+        <p className="tab">{title}</p>
+        <h6>
+          <Badge pill variant="danger" className="badge">
+            12
+          </Badge>
+        </h6>
+      </div>
+    );
+  };
+
   const renderTab = () => {
     return (
       <Tabs
         id="controlled-tab-example"
         activeKey={key}
         onSelect={(k) => setEvent(k)}
+        className="tab"
       >
         {statusId.includes(0) && (
-          <Tab eventKey="save_draft" title="บันทึกฉบับร่าง">
+          <Tab eventKey="save_draft" title={badgeTab("บันทึกฉบับร่าง")}>
             {Tables()}
           </Tab>
         )}
         {statusId.includes(1) && (
-          <Tab eventKey="request" title="ส่ง">
+          <Tab eventKey="request" title={badgeTab("ส่ง")}>
             {Tables()}
           </Tab>
         )}
         {statusId.includes(2) && (
-          <Tab eventKey="approved" title="อนุมัติ">
+          <Tab eventKey="approved" title={badgeTab("อนุมัติ")}>
             {Tables()}
           </Tab>
         )}
         {statusId.includes(3) && (
-          <Tab eventKey="accept" title="รับงานแล้ว">
+          <Tab eventKey="accept" title={badgeTab("รับงาน")}>
             {Tables()}
           </Tab>
         )}
         {statusId.includes(4) && (
-          <Tab eventKey="complete" title="ส่งงานแล้ว">
+          <Tab eventKey="complete" title={badgeTab("ส่งงาน")}>
             {Tables()}
           </Tab>
         )}
         {statusId.includes(5) && (
-          <Tab eventKey="reject" title="ปฏิเสธ">
+          <Tab eventKey="reject" title={badgeTab("ปฏิเสธ")}>
             {Tables()}
           </Tab>
         )}
